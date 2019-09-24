@@ -1,4 +1,5 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
+import { UseInterceptors } from '@nestjs/common';
 import { ProjectService } from './project.service';
 
 @Controller('projects')
@@ -6,12 +7,12 @@ export class ProjectController {
   constructor(private projectService: ProjectService) {}
 
   @Get()
-  findAll() {
-    return this.projectService.findAll();
+  async index(@Query() query: object) {
+    return await this.projectService.queryProjects(query);
   }
 
   @Get(':id')
-  findOne(@Param() params) {
+  async show(@Param() params) {
     return this.projectService.findOne(params.id);
   }
 }
