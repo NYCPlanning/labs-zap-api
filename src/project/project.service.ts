@@ -8,6 +8,7 @@ import { paginate, Pagination, IPaginationOptions } from 'nestjs-typeorm-paginat
 import { Request } from 'express';
 import { bbox, buffer, point } from '@turf/turf';
 import { ConfigService } from '../config/config.service';
+import { TilesService } from './tiles/tiles.service';
 import { getQueryFile } from './_utils/get-query-file';
 import { buildProjectsSQL } from './_utils/build-projects-sql';
 import { Project } from './project.entity';
@@ -28,6 +29,7 @@ export class ProjectService {
     @InjectRepository(Project)
     private readonly projectRepository: Repository<Project>,
     private readonly config: ConfigService,
+    private readonly tiles: TilesService,
   ) {}
 
   async findOne(id: string): Promise<Project> {
@@ -72,7 +74,9 @@ export class ProjectService {
     let bounds = [[-74.2553345639348, 40.498580711525], [-73.7074928813077, 40.9141778017518]];
 
     if (projectsWithGeometries.length > 0) {
-      let [computedBounds] = await this.projectRepository.query(pgp.as.format(boundingBoxQuery, { tileSQL }));
+      let [computedBounds] = await this.projectRepository.query(
+        pgp.as.format(boundingBoxQuery, { tileSQL })
+      );
       bounds = computedBounds.bbox;
     }
 
@@ -92,14 +96,10 @@ export class ProjectService {
       ];
     }
 
-    // create a shortid for this query and store it in the cache
-    // TODO: ADD BACK
-    // Add in a shared service
-    // const tileId = shortid.generate();
-    // await app.tileCache.set(tileId, tileSQL);
+    const tileId = await this.tiles.generateTileId(tileSQL);
 
     return {
-      tiles: [`${this.config.get('HOST')}/projects/tiles/TODO/{z}/{x}/{y}.mvt`],
+      tiles: [`${this.config.get('HOST')}/projects/tiles/${tileId}/{z}/{x}/{y}.mvt`],
       bounds,
     };
   }

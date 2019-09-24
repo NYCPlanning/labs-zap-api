@@ -38,6 +38,8 @@
     "reflect-metadata": "^0.1.12",
     "rimraf": "^2.6.2",
     "rxjs": "^6.3.3",
+    "shortid": "^2.2.15",
+    "sphericalmercator": "^1.0.5",
     "ts-loader": "^6.1.2",
     "typeorm": "^0.2.19",
     "webpack": "^4.40.2",
