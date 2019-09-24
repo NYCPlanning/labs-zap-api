@@ -1,14 +1,16 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query, Req } from '@nestjs/common';
 import { UseInterceptors } from '@nestjs/common';
+import { Request } from 'express';
 import { ProjectService } from './project.service';
 
 @Controller('projects')
 export class ProjectController {
   constructor(private projectService: ProjectService) {}
 
+  // Extract the raw Express instance and pass to the query method
   @Get()
-  async index(@Query() query: object) {
-    return await this.projectService.queryProjects(query);
+  async index(@Req() request: Request) {
+    return await this.projectService.queryProjects(request);
   }
 
   @Get(':id')

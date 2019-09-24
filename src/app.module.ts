@@ -4,6 +4,7 @@ import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProjectModule } from './project/project.module';
+import { TileCacheService } from './tile-cache/tile-cache.service';
 
 @Module({
   imports: [
@@ -20,6 +21,6 @@ import { ProjectModule } from './project/project.module';
     }),
     ConfigModule,
    ],
-  providers: [AppService],
+  providers: [AppService, TileCacheService],
 })
 export class AppModule {}
