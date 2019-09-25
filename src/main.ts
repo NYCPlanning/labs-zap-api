@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import * as compression from 'compression';
 import { AppModule } from './app.module';
 
 declare const module: any;
@@ -10,6 +11,8 @@ async function bootstrap() {
       credentials: true,
     },
   });
+
+  app.use(compression());
 
   await app.listen(3000);
 

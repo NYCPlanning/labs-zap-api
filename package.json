@@ -29,6 +29,7 @@
     "@turf/helpers": "^6.1.4",
     "@turf/turf": "^5.1.6",
     "@types/dotenv": "^6.1.1",
+    "compression": "^1.7.4",
     "dotenv": "^8.1.0",
     "jsonapi-serializer": "^3.6.5",
     "nestjs-typeorm-paginate": "^1.0.2",
