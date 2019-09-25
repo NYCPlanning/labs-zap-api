@@ -1,4 +1,12 @@
-import { Controller, Header, Get, Param, Query, Req } from '@nestjs/common';
+import {
+  Controller,
+  Header,
+  Get,
+  Param,
+  Query,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { UseInterceptors } from '@nestjs/common';
 import { Request } from 'express';
 import { ProjectService } from './project.service';
@@ -22,15 +30,17 @@ export class ProjectController {
     return this.projectService.findOne(params.id);
   }
 
-  @Get('/tiles/:tileId/:x/:y/:z')
-  @Header('Content-Type', 'application/x-protobuf')
-  async handleTileRequest(
-    @Query('type') type,
-    @Param('tileId') tileId,
-    @Param('x') x,
-    @Param('y') y,
-    @Param('z') z,
-  ) {
-    return this.tilesService.generateTile(type, tileId, x, y, z);
+  @Get('/tiles/:tileId/:z/:x/:y.mvt')
+  async handleTileRequest(@Req() request: Request, @Res() response) {
+    const { type } = request.query;
+    const { tileId, x, y, z } = request.params;
+    const tile = await this.tilesService.generateTile(type, tileId, x, y, z);
+
+    response.setHeader('Content-Type', 'application/x-protobuf');
+
+    if (tile.length === 0) {
+      response.status(204);
+    }
+    response.send(tile);
   }
 }

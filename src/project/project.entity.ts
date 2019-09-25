@@ -73,4 +73,34 @@ export class Project {
 
   @Column()
   dcp_femafloodzonev: string;
+
+  @Column()
+  dcp_publicstatus_simp: string;
+
+  @Column()
+  actiontypes: string;
+
+  @Column()
+  dcp_certifiedreferred: string;
+
+  @Column()
+  dcp_femafloodzoneshadedx: string;
+
+  @Column()
+  applicants: string;
+
+  @Column()
+  lastmilestonedate: string;
+
+  @Column()
+  total_projects: string;
+
+  @Column()
+  has_centroid: string;
+
+  @Column()
+  center: string;
+
+  @Column()
+  ulurpnumber: string;
 }

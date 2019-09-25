@@ -46,10 +46,10 @@ export class TilesService {
 
     const geomColumn = (type === 'centroid') ? 'centroid_3857' : 'polygons_3857';
 
-    const [tile] = await this.projectRepository.query(
-      pgp.as.format(generateVectorTile, [...bbox, tileQuery, geomColumn])
-    );
+    const formattedQuery = pgp.as.format(generateVectorTile, [...bbox, tileQuery, geomColumn]);
 
-    return tile;
+    const [{ st_asmvt }] = await this.projectRepository.query(formattedQuery);
+
+    return st_asmvt;
   }
 }
