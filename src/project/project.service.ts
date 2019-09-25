@@ -6,6 +6,8 @@ import { Serializer } from 'jsonapi-serializer';
 import { Query } from '@nestjs/common';
 import { paginate, Pagination, IPaginationOptions } from 'nestjs-typeorm-paginate';
 import { Request } from 'express';
+import { getVideoLinks } from './_utils/get-video-links';
+import { injectSupportDocumentURLs } from './_utils/inject-supporting-document-urls';
 import { bbox, buffer, point } from '@turf/turf';
 import { ConfigService } from '../config/config.service';
 import { TilesService } from './tiles/tiles.service';
@@ -13,6 +15,7 @@ import { getQueryFile } from './_utils/get-query-file';
 import { buildProjectsSQL } from './_utils/build-projects-sql';
 import { Project } from './project.entity';
 
+const findProjectQuery = getQueryFile('/projects/show.sql');
 const boundingBoxQuery = getQueryFile('helpers/bounding-box-query.sql');
 const tileQuery = getQueryFile('helpers/tile-query.sql');
 
@@ -33,9 +36,23 @@ export class ProjectService {
   ) {}
 
   async findOne(id: string): Promise<Project> {
-    const record = await this.projectRepository.findOne({ dcp_name: id });
+    const [project] = await this.projectRepository.query(
+      pgp.as.format(findProjectQuery, { id })
+    );
 
-    return this.serialize(record);
+    project.bbl_featurecollection = {
+      type: 'FeatureCollection',
+      features: [{
+        type: 'Feature',
+        geometry: JSON.parse(project.bbl_multipolygon),
+      }],
+    };
+
+    await injectSupportDocumentURLs(project);
+
+    project.video_links = await getVideoLinks(this.config.get('AIRTABLE_API_KEY'), project.dcp_name);
+
+    return this.serialize(project);
   }
 
   // TODO: Use the ORM for this instead of buildProjectsSQL
@@ -130,9 +147,30 @@ export class ProjectService {
 
   // Serializes an array of objects into a JSON:API document
   serialize(records, opts?: object): Serializer {
+    let [project] = (records.length ? records : [records]);
+    const [action = {}] = project.actions || [];
+    const [milestone = {}] = project.milestones || [];
+
+    // This is wrong... the wrong approach.
     const ProjectSerializer = new Serializer('projects', {
       id: 'dcp_name',
-      attributes: this.projectRepository.metadata.columns.map(col => col.databaseName),
+      attributes: Object.keys(project),
+      ...(action ? {     
+        actions: {
+          ref(project, action) {
+            return `${project.dcp_name}-${action.actioncode}`;
+          },
+          attributes: Object.keys(action),
+        },
+      } : {}),
+      ...(milestone ? {   
+        milestones: {
+          ref(project, milestone) {
+            return `${project.dcp_name}-${milestone.dcp_milestone}`;
+          },
+          attributes: Object.keys(milestone),
+        },
+      } : {}),
       meta: { ...opts },
     });
 

@@ -6,6 +6,12 @@ export class Project {
   dcp_projectid: number;
 
   @Column()
+  milestones: string;
+
+  @Column()
+  actions: string;
+
+  @Column()
   dcp_name: string;
 
   @Column()
@@ -103,4 +109,10 @@ export class Project {
 
   @Column()
   ulurpnumber: string;
+
+  @Column()
+  bbl_featurecollection: string;
+
+  @Column()
+  video_links: string;
 }
