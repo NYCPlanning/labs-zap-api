@@ -22,7 +22,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "webpack": "webpack --config webpack.config.js",
     "copy-query-files": "cp -R src/project/_queries dist/project/",
-    "postinstall": "yarn run build && yarn run copy-query-files"
+    "postinstall": "yarn run build"
   },
   "dependencies": {
     "@nestjs/common": "^6.0.0",
