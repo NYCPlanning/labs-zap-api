@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import * as compression from 'compression';
+import * as cookieparser from 'cookie-parser';
 import { AppModule } from './app.module';
 
 declare const module: any;
@@ -13,6 +14,7 @@ async function bootstrap() {
   });
 
   app.use(compression());
+  app.use(cookieparser());
 
   await app.listen(3000);
 

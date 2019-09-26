@@ -80,17 +80,17 @@ export function buildProjectsSQL(req, type = 'filter') {
   const paginate = generateDynamicQuery(paginateQuery, { itemsPerPage, offset: (page - 1) * itemsPerPage });
 
   if (type === 'filter') {
-    const { contactId } = session;
+    const { contactid } = session;
 
     // we have different queries for LUPP things
-    if (project_lup_status && contactId) {
+    if (project_lup_status && contactid) {
       // one of 'archive', 'reviewed', 'to-review', 'upcoming'
       if (!['archive', 'reviewed', 'to-review', 'upcoming'].includes(project_lup_status)) {
         throw new Error('Must be one of archive, reviewed, to-review, upcoming');
       }
 
       return pgp.as.format(userProjectsQuery, {
-        id: contactId,
+        id: contactid,
         status: project_lup_status,
       });
     }
