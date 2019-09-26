@@ -10,7 +10,7 @@ const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGIN
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     cors: {
-      origin: [/\.zap-staging-lupp\.planninglabs.nyc\.nyc$/],
+      origin: [/\.planninglabs\.nyc$/, /\.planning\.nyc\.gov$/,'http://localhost:4200','http://localhost:3000'],
       credentials: true,
     },
   });
