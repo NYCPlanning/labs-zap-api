@@ -4,7 +4,9 @@
   "description": "",
   "author": "",
   "license": "MIT",
-  "node": "v10.15.3",
+  "engines": {
+    "node": "v10.15.3"
+  },
   "scripts": {
     "build": "rimraf dist && tsc -p tsconfig.build.json",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"libs/**/*.ts\"",
@@ -18,7 +20,9 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "webpack": "webpack --config webpack.config.js"
+    "webpack": "webpack --config webpack.config.js",
+    "copy-query-files": "cp -R src/project/_queries dist/project/",
+    "postinstall": "yarn run build && yarn run copy-query-files"
   },
   "dependencies": {
     "@nestjs/common": "^6.0.0",

@@ -16,7 +16,7 @@ async function bootstrap() {
   app.use(compression());
   app.use(cookieparser());
 
-  await app.listen(3000);
+  await app.listen(process.env.PORT || 3000);
 
   if (module.hot) {
     module.hot.accept();
