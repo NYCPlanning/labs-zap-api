@@ -4,6 +4,7 @@
   "description": "",
   "author": "",
   "license": "MIT",
+  "node": "v10.15.3",
   "scripts": {
     "build": "rimraf dist && tsc -p tsconfig.build.json",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"libs/**/*.ts\"",
