@@ -5,10 +5,12 @@ import { AppModule } from './app.module';
 
 declare const module: any;
 
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:4200', 'http://localhost:3000'];
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     cors: {
-      origin: ['http://localhost:4200', 'http://localhost:3000'],
+      origin: ALLOWED_ORIGINS,
       credentials: true,
     },
   });
@@ -23,4 +25,5 @@ async function bootstrap() {
     module.hot.dispose(() => app.close());
   }
 }
+
 bootstrap();
