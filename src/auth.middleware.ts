@@ -15,11 +15,6 @@ export class AuthMiddleware implements NestMiddleware {
 
     const { token } = req.cookies;
 
-    // no token -- clear cookies and proceed unauthed
-    if (!token) {
-      return proceedNoAuth(res, next);
-    }
-
     try {
       req.session = await this.authService.validateCRMToken(token);
       next();
