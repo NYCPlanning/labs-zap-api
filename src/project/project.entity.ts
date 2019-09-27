@@ -2,8 +2,8 @@ import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity('dcp_project')
 export class Project {
-  @PrimaryColumn()
-  dcp_projectid: number;
+  @PrimaryColumn({ name: 'dcp_projectid' })
+  projectid: number;
 
   @Column()
   milestones: string;
@@ -11,86 +11,86 @@ export class Project {
   @Column()
   actions: string;
 
-  @Column()
-  dcp_name: string;
+  @Column({ name: 'dcp_name' })
+  name: string;
 
-  @Column()
-  dcp_projectname: string;
+  @Column({ name: 'dcp_projectname' })
+  projectname: string;
 
-  @Column()
-  dcp_projectbrief: string;
+  @Column({ name: 'dcp_projectbrief' })
+  projectbrief: string;
 
-  @Column()
-  dcp_borough: string;
+  @Column({ name: 'dcp_borough' })
+  borough: string;
 
-  @Column()
-  dcp_communitydistricts: string;
+  @Column({ name: 'dcp_communitydistricts' })
+  communitydistricts: string;
 
-  @Column()
-  dcp_ulurp_nonulurp: string;
+  @Column({ name: 'dcp_ulurp_nonulurp' })
+  ulurp_nonulurp: string;
 
-  @Column()
-  dcp_leaddivision: string;
+  @Column({ name: 'dcp_leaddivision' })
+  leaddivision: string;
 
-  @Column()
-  dcp_ceqrtype: string;
+  @Column({ name: 'dcp_ceqrtype' })
+  ceqrtype: string;
 
-  @Column()
-  dcp_ceqrnumber: string;
+  @Column({ name: 'dcp_ceqrnumber' })
+  ceqrnumber: string;
 
-  @Column()
-  dcp_easeis: string;
+  @Column({ name: 'dcp_easeis' })
+  easeis: string;
 
-  @Column()
-  dcp_leadagencyforenvreview: string;
+  @Column({ name: 'dcp_leadagencyforenvreview' })
+  leadagencyforenvreview: string;
 
-  @Column()
-  dcp_alterationmapnumber: string;
+  @Column({ name: 'dcp_alterationmapnumber' })
+  alterationmapnumber: string;
 
-  @Column()
-  dcp_sischoolseat: string;
+  @Column({ name: 'dcp_sischoolseat' })
+  sischoolseat: string;
 
-  @Column()
-  dcp_sisubdivision: string;
+  @Column({ name: 'dcp_sisubdivision' })
+  sisubdivision: string;
 
-  @Column()
-  dcp_previousactiononsite: string;
+  @Column({ name: 'dcp_previousactiononsite' })
+  previousactiononsite: string;
 
-  @Column()
-  dcp_wrpnumber: string;
+  @Column({ name: 'dcp_wrpnumber' })
+  wrpnumber: string;
 
-  @Column()
-  dcp_nydospermitnumber: string;
+  @Column({ name: 'dcp_nydospermitnumber' })
+  nydospermitnumber: string;
 
-  @Column()
-  dcp_bsanumber: string;
+  @Column({ name: 'dcp_bsanumber' })
+  bsanumber: string;
 
-  @Column()
-  dcp_lpcnumber: string;
+  @Column({ name: 'dcp_lpcnumber' })
+  lpcnumber: string;
 
-  @Column()
-  dcp_decpermitnumber: string;
+  @Column({ name: 'dcp_decpermitnumber' })
+  decpermitnumber: string;
 
-  @Column()
-  dcp_femafloodzonea: string;
+  @Column({ name: 'dcp_femafloodzonea' })
+  femafloodzonea: string;
 
-  @Column()
-  dcp_femafloodzonecoastala: string;
+  @Column({ name: 'dcp_femafloodzonecoastala' })
+  femafloodzonecoastala: string;
 
-  @Column()
-  dcp_femafloodzonev: string;
+  @Column({ name: 'dcp_femafloodzonev' })
+  femafloodzonev: string;
 
-  @Column()
-  dcp_publicstatus_simp: string;
+  @Column({ name: 'dcp_publicstatus_simp' })
+  publicstatus_simp: string;
 
   @Column()
   actiontypes: string;
 
-  @Column()
-  dcp_certifiedreferred: string;
+  @Column({ name: 'dcp_certifiedreferred' })
+  certifiedreferred: string;
 
-  @Column()
-  dcp_femafloodzoneshadedx: string;
+  @Column({ name: 'dcp_femafloodzoneshadedx' })
+  femafloodzoneshadedx: string;
 
   @Column()
   applicants: string;

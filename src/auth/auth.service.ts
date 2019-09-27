@@ -40,6 +40,12 @@ export class AuthService {
   }
 
   validateToken(token, secret): any {
+    const CRM_IMPOSTER_ID = this.config.get('CRM_IMPOSTER_ID');
+
+    if (this.config.get('SKIP_AUTH')) return {
+      contactid: CRM_IMPOSTER_ID
+    }
+
     try {
       return jwt.verify(token, secret);
     } catch (e) {

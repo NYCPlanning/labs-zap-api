@@ -150,12 +150,13 @@ export class ProjectService {
     let [project] = (records.length ? records : [records]);
     const [action = {}] = project.actions || [];
     const [milestone = {}] = project.milestones || [];
+    const [disposition = {}] = project.dispositions || [];
 
     // This is wrong... the wrong approach.
     const ProjectSerializer = new Serializer('projects', {
       id: 'dcp_name',
       attributes: Object.keys(project),
-      ...(action ? {     
+      ...(action ? {
         actions: {
           ref(project, action) {
             return `${project.dcp_name}-${action.actioncode}`;
@@ -163,12 +164,18 @@ export class ProjectService {
           attributes: Object.keys(action),
         },
       } : {}),
-      ...(milestone ? {   
+      ...(milestone ? {
         milestones: {
           ref(project, milestone) {
             return `${project.dcp_name}-${milestone.dcp_milestone}`;
           },
           attributes: Object.keys(milestone),
+        },
+      } : {}),
+      ...(milestone ? {
+        dispositions: {
+          ref: 'disposition_id',
+          attributes: Object.keys(disposition),
         },
       } : {}),
       meta: { ...opts },

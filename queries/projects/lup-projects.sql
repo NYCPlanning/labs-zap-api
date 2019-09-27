@@ -85,7 +85,7 @@ SELECT
     WHERE
       disp.dcp_project = p.dcp_projectid
       AND disp.dcp_recommendationsubmittedby = '${id:value}' -- plugs in contactid
-  ) AS project_dispositions,
+  ) AS dispositions,
   (
     SELECT json_agg(json_build_object(
       'dcp_name', m.dcp_name,
@@ -242,7 +242,7 @@ SELECT
         display_sequence,
         display_date
     ) AS m
-  ) AS project_milestones
+  ) AS milestones
 FROM lups_project_assignments AS lup
 LEFT JOIN
   dcp_project AS p ON p.dcp_projectid = lup.project_id
