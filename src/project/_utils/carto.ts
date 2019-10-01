@@ -5,6 +5,7 @@ const cartoUsername = 'planninglabs';
 const buildSqlUrl = (cleanedQuery, format = 'json', method) => { // eslint-disable-line
   let url = `https://${cartoUsername}.carto.com/api/v2/sql`;
   url += method === 'get' ? `?q=${cleanedQuery}&format=${format}` : '';
+
   return url;
 };
 

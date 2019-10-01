@@ -1,4 +1,10 @@
 import { carto } from './carto';
+import * as pgp from 'pg-promise';
+
+export interface IUpsertGeomsResult {
+  status: string
+  message: string
+}
 
 const matchBBLSQL = `
   SELECT
@@ -69,11 +75,11 @@ const getProjectGeoms = async (bbls) => {
   return cartoResponse[0]; // return first object in carto response, carto.sql always return an array
 };
 
-export async function upsertGeoms(id, db) {
-  const { bbls } = await db.one(matchBBLSQL, { id }); // an array of bbls that match the project id
+export async function upsertGeoms(id, db): Promise<IUpsertGeomsResult> {
+  const [{ bbls }] = await db.query(pgp.as.format(matchBBLSQL, { id })); // an array of bbls that match the project id
   // if a project has no bbls, remove project
   if (!bbls) {
-    await db.none(deleteProjectSQL, { id }); // eslint-disable-line,
+    await db.query(pgp.as.format(deleteProjectSQL, { id })); // eslint-disable-line,
     return {
       status: 'failure',
       message: `ZAP data does not list any BBLs for project ${id}`,
@@ -90,12 +96,12 @@ export async function upsertGeoms(id, db) {
   }
 
   // update geometry on existing project or insert new project with geoms (upsert)
-  await db.none(upsertSQL, {
+  await db.query(pgp.as.format(upsertSQL, {
     id,
     polygons,
     centroid,
     mappluto_v,
-  });
+  }));
 
   return {
     status: 'success',
