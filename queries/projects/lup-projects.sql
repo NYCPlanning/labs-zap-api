@@ -60,7 +60,7 @@ SELECT
   (
     SELECT json_agg(
       json_build_object(
-        'disposition_id', disp.dcp_communityboarddispositionid,
+        'id', disp.dcp_communityboarddispositionid,
         'action_id', disp.dcp_projectaction,
         'action_name', pact.dcp_name,
         'action_ulurp_number', pact.dcp_ulurpnumber,
