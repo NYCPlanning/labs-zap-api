@@ -11,6 +11,7 @@ import { AppController } from './app.controller';
 import { ContactModule } from './contact/contact.module';
 import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
+import { DispositionModule } from './disposition/disposition.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     ConfigModule,
     AuthModule,
+    DispositionModule,
    ],
   providers: [AppService],
   controllers: [AppController],
