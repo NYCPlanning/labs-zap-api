@@ -41,11 +41,13 @@ export class TilesService {
     // retreive the projectids from the cache
     const tileQuery = await this.get(tileId);
 
-    console.log(`TileID: ${tileId}; tileQuery: ${tileQuery}`);
     // calculate the bounding box for this tile
     const bbox = this.mercator.bbox(x, y, z, false, '900913');
+
     const geomColumn = (type === 'centroid') ? 'centroid_3857' : 'polygons_3857';
+
     const formattedQuery = pgp.as.format(generateVectorTile, [...bbox, tileQuery, geomColumn]);
+
     const [{ st_asmvt }] = await this.projectRepository.query(formattedQuery);
 
     return st_asmvt;
