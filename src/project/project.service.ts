@@ -172,9 +172,9 @@ export class ProjectService {
           attributes: Object.keys(milestone),
         },
       } : {}),
-      ...(milestone ? {
+      ...(disposition ? {
         dispositions: {
-          ref: 'disposition_id',
+          ref: 'id',
           attributes: Object.keys(disposition),
         },
       } : {}),

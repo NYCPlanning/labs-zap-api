@@ -351,7 +351,8 @@ SELECT
         'boroughboardrecommendation', disp.dcp_boroughboardrecommendation,
         'communityboardrecommendation', disp.dcp_communityboardrecommendation,
         'boroughpresidentrecommendation', disp.dcp_boroughpresidentrecommendation,
-        'dcp_projectaction', disp.dcp_projectaction
+        'dcp_projectaction', disp.dcp_projectaction,
+        'id', disp.dcp_communityboarddispositionid
       )
     )
     FROM dcp_communityboarddisposition AS disp
