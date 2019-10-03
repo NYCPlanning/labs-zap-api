@@ -21,12 +21,14 @@ const matchBBLSQL = `
 
 // SQL template, upsert command to insert rows that don't exist and update rows that do exist
 const upsertSQL = `
-  INSERT INTO project_geoms(projectid, polygons, centroid, mappluto_v)
+  INSERT INTO project_geoms(projectid, polygons, centroid, polygons_3857, centroid_3857, mappluto_v)
   VALUES
     (
     \${id},
     \${polygons},
     \${centroid},
+    \${polygons_3857},
+    \${centroid_3857},
     \${mappluto_v}
     )
   ON CONFLICT (projectid)
@@ -35,6 +37,8 @@ const upsertSQL = `
       SET
         polygons = \${polygons},
         centroid = \${centroid},
+        polygons_3857 = \${polygons_3857},
+        centroid_3857 = \${centroid_3857},
         mappluto_v = \${mappluto_v};
 `;
 
@@ -57,6 +61,8 @@ const getProjectGeoms = async (bbls) => {
     SELECT
       ST_Multi(ST_Union(the_geom)) AS polygons,
       ST_Centroid(ST_Union(the_geom)) AS centroid,
+      ST_Multi(ST_Union(the_geom_webmercator)) AS polygons_3857,
+      ST_Centroid(ST_Union(the_geom_webmercator)) AS centroid_3857,
       version AS mappluto_v
     FROM mappluto
     WHERE bbl IN (${collectedBBLs.join(',')})
@@ -68,6 +74,8 @@ const getProjectGeoms = async (bbls) => {
     return {
       polygons: null,
       centroid: null,
+      polygons_3857: null,
+      centroid_3857: null,
       mappluto_v: null,
     };
   }
@@ -86,7 +94,13 @@ export async function upsertGeoms(id, db): Promise<IUpsertGeomsResult> {
     };
   }
 
-  const { polygons, centroid, mappluto_v } = await getProjectGeoms(bbls); // get geoms from carto that match array of bbls
+  const {
+    polygons,
+    centroid,
+    polygons_3857,
+    centroid_3857,
+    mappluto_v,
+  } = await getProjectGeoms(bbls); // get geoms from carto that match array of bbls
 
   if (polygons == null) {
     return {
@@ -100,6 +114,8 @@ export async function upsertGeoms(id, db): Promise<IUpsertGeomsResult> {
     id,
     polygons,
     centroid,
+    polygons_3857,
+    centroid_3857,
     mappluto_v,
   }));
 
