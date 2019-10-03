@@ -6,11 +6,11 @@ WITH lups_project_assignments AS (
       WHEN mm.statuscode = 'Not Started' THEN 'upcoming'
       WHEN mm.statuscode IN ('Completed', 'Overridden') AND p.dcp_publicstatus NOT IN ('Approved', 'Withdrawn') THEN 'reviewed'
       WHEN mm.statuscode IN ('Completed', 'Overridden') AND p.dcp_publicstatus IN ('Approved', 'Withdrawn') THEN 'archive'
-    END AS dashboard_tab,
+    END AS tab,
     lup.dcp_project AS project_id,
     lup.dcp_project AS dcp_name,
     lup.dcp_name AS lup_name,
-    lup.dcp_lupteammemberrole AS lup_role,
+    lup.dcp_lupteammemberrole AS dcp_lupteammemberrole,
     p.dcp_publicstatus,
     p.dcp_projectname,
     p.dcp_projectbrief,
@@ -246,4 +246,4 @@ SELECT
 FROM lups_project_assignments AS lup
 LEFT JOIN
   dcp_project AS p ON p.dcp_projectid = lup.project_id
-WHERE dashboard_tab = '${status:value}'
+WHERE tab = '${status:value}'
