@@ -20,7 +20,11 @@ const getProjectsSQL = `
     AND d.dcp_name NOT IN (SELECT projectid FROM project_geoms)
     AND d.dcp_visibility = 'General Public'
     AND d.dcp_projectid IN (
-      SELECT DISTINCT dcp_project FROM dcp_projectbbl WHERE statuscode = 'Active')
+      SELECT DISTINCT dcp_project
+      FROM dcp_projectbbl
+      WHERE statuscode = 'Active'
+      AND modifiedon > (NOW() - interval '360 days')
+    )
   `;
 
 @Injectable()
