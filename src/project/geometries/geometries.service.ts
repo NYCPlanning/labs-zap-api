@@ -63,7 +63,7 @@ export class GeometriesService {
     const projects = await this.projectRepository.query(getProjectsSQL);
     const projectIDs = projects.map(d => d.dcp_name);
 
-    console.log(`Found ${projects.length} projects`); // eslint-disable-line
+    console.log(`Found ${projects.length} projects`);
 
     const responseTemplate = {
       success: 0,

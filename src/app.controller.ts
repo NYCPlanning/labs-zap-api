@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { Get, Query, Res, Session } from '@nestjs/common';
+import { Get, Query, Res, Session, Next } from '@nestjs/common';
 import { Response } from 'express';
 import { Serializer } from 'jsonapi-serializer';
 import { AuthService } from './auth/auth.service';
@@ -21,11 +21,17 @@ export class AppController {
   }
 
   @Get('/users')
-  async getUser(@Session() session) {
+  async getUser(@Session() session, @Res() res) {
     const { contactid } = session;
     const contact = await this.contactService.findOne(contactid);
 
-    return this.serialize(contact);
+    if (!contactid) {
+      res.status(401).send({
+        errors: ['Authentication required for this route'],
+      });
+    }
+
+    res.send(this.serialize(contact));
   }
 
   // Serializes an array of objects into a JSON:API document
