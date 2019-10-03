@@ -6,7 +6,7 @@ import { Project } from '../project.entity';
 import { upsertGeoms, IUpsertGeomsResult } from '../_utils/upsert-geoms';
 import { ConfigService } from '../../config/config.service';
 
-const GEOM_UPSERT_CONCURRENCY_LIMIT = 4;
+const GEOM_UPSERT_CONCURRENCY_LIMIT = 1;
 const getProjectsSQL = `
   SELECT
     d.dcp_name
