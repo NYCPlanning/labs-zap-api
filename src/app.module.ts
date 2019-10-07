@@ -12,6 +12,7 @@ import { ContactModule } from './contact/contact.module';
 import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
 import { DispositionModule } from './disposition/disposition.module';
+import { OdataModule } from './odata/odata.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { DispositionModule } from './disposition/disposition.module';
     ConfigModule,
     AuthModule,
     DispositionModule,
+    OdataModule,
    ],
   providers: [AppService],
   controllers: [AppController],
