@@ -34,6 +34,7 @@
     "@turf/helpers": "^6.1.4",
     "@turf/turf": "^5.1.6",
     "@types/dotenv": "^6.1.1",
+    "adal-node": "^0.2.1",
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.4",
@@ -55,7 +56,8 @@
     "typeorm": "^0.2.19",
     "webpack": "^4.40.2",
     "webpack-cli": "^3.3.9",
-    "webpack-node-externals": "^1.7.2"
+    "webpack-node-externals": "^1.7.2",
+    "zlib": "^1.0.5"
   },
   "devDependencies": {
     "@nestjs/testing": "^6.0.0",
