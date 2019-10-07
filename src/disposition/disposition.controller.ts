@@ -3,11 +3,17 @@ import {
   Patch,
   Body,
   Req,
+  Param,
 } from '@nestjs/common';
 import { Deserializer } from 'jsonapi-serializer';
+import { pick } from 'underscore';
 import { OdataService } from '../odata/odata.service';
 
-const ATTR_WHITELIST = ['dcp_dateofpublichearing']
+// Only attrs in the whitelist get posted
+const ATTRS_WHITELIST = [
+  'dcp_publichearinglocation',
+  'dcp_dateofpublichearing',
+];
 const { deserialize } = new Deserializer({
   keyForAttribute: 'underscore_case',
 });
@@ -19,15 +25,11 @@ export class DispositionController {
   ) {}
 
   @Patch('/:id')
-  async update(@Body() body) {
-    const { data: { id } } = body;
-    const attributes = {
-      dcp_dateofpublichearing: '2019-10-09T17:01:00.000Z',
-    };
+  async update(@Body() body, @Param('id') id) {
+    const attributes = await deserialize(body);
+    const whitelistedAttrs = pick(attributes, ATTRS_WHITELIST);
 
-    console.log(await deserialize(body));
-
-    // await this.dynamicsWebApi.update('dcp_communityboarddispositions', id, attributes);
+    await this.dynamicsWebApi.update('dcp_communityboarddispositions', id, whitelistedAttrs);
 
     return body;
   }

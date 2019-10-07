@@ -54,6 +54,7 @@
     "sphericalmercator": "^1.0.5",
     "ts-loader": "^6.1.2",
     "typeorm": "^0.2.19",
+    "underscore": "^1.9.1",
     "webpack": "^4.40.2",
     "webpack-cli": "^3.3.9",
     "webpack-node-externals": "^1.7.2",
