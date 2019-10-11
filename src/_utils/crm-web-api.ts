@@ -9,7 +9,7 @@ export const CRMWebAPI = {
     return `${this.CRMUrl}${this.webAPIurl}`;
   },
 
-  dateReviver: async function (key, value) {
+  dateReviver: function (key, value) {
     if (typeof value === 'string') {
       // YYYY-MM-DDTHH:mm:ss.sssZ => parsed as UTC
       // YYYY-MM-DD => parsed as local date
@@ -35,7 +35,7 @@ export const CRMWebAPI = {
   },
 
   parseErrorMessage: async function (json) {
-    if (json && json.error) return json.error.message;
+    if (json && json.error) return json.error;
 
     return "Error";
   },
