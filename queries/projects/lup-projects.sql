@@ -4,7 +4,11 @@ WITH lups_project_assignments AS (
     CASE
       WHEN mm.statuscode = 'In Progress' THEN 'to-review'
       WHEN mm.statuscode = 'Not Started' THEN 'upcoming'
-      WHEN mm.statuscode IN ('Completed', 'Overridden') AND p.dcp_publicstatus NOT IN ('Approved', 'Withdrawn') THEN 'reviewed'
+      WHEN
+        (mm.statuscode IN ('Completed', 'Overridden') AND p.dcp_publicstatus NOT IN ('Approved', 'Withdrawn'))
+        OR (mm.statuscode = 'In Progress' AND COALESCE(COALESCE(disp.dcp_boroughpresidentrecommendation), COALESCE(disp.dcp_boroughboardrecommendation), COALESCE(disp.dcp_communityboardrecommendation)) IS NOT NULL)
+        THEN 'reviewed'
+        -- note: if we allow users to save progress and do partial submissions in the future, we will need to replace these coalesces
       WHEN mm.statuscode IN ('Completed', 'Overridden') AND p.dcp_publicstatus IN ('Approved', 'Withdrawn') THEN 'archive'
     END AS tab,
     lup.dcp_project AS project_id,
@@ -26,6 +30,10 @@ WITH lups_project_assignments AS (
     dcp_project AS p ON lup.dcp_project = p.dcp_projectid
   INNER JOIN -- inner because we only want certain milestones with the status included in the "where" clause
     dcp_projectmilestone AS mm ON lup.dcp_project = mm.dcp_project
+  LEFT JOIN
+    dcp_communityboarddisposition AS disp
+    ON disp.dcp_project = lup.dcp_project
+    AND disp.dcp_recommendationsubmittedby = '${id:value}' -- plugs in contactid
   WHERE
     lup.dcp_lupteammember = '${id:value}' -- plugs in contactid
     AND p.dcp_visibility = 'General Public'
