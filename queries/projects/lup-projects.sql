@@ -2,10 +2,16 @@
 WITH lups_project_assignments AS (
   SELECT DISTINCT
     CASE
+      WHEN mm.statuscode = 'Completed' AND p.dcp_publicstatus IN ('Approved', 'Withdrawn') THEN 'archive'
+      WHEN
+        (mm.statuscode = 'Completed' AND p.dcp_publicstatus NOT IN ('Approved', 'Withdrawn'))
+        OR (mm.statuscode = 'In Progress' AND lup.dcp_lupteammemberrole = 'BP' AND COALESCE(disp.dcp_boroughpresidentrecommendation) IS NOT NULL)
+        OR (mm.statuscode = 'In Progress' AND lup.dcp_lupteammemberrole = 'BB' AND COALESCE(disp.dcp_boroughboardrecommendation) IS NOT NULL)
+        OR (mm.statuscode = 'In Progress' AND lup.dcp_lupteammemberrole = 'CB' AND COALESCE(disp.dcp_communityboardrecommendation) IS NOT NULL)
+        THEN 'reviewed'
+        -- note: if we allow users to save progress and do partial submissions in the future, we will need to replace these coalesces
       WHEN mm.statuscode = 'In Progress' THEN 'to-review'
       WHEN mm.statuscode = 'Not Started' THEN 'upcoming'
-      WHEN mm.statuscode IN ('Completed', 'Overridden') AND p.dcp_publicstatus NOT IN ('Approved', 'Withdrawn') THEN 'reviewed'
-      WHEN mm.statuscode IN ('Completed', 'Overridden') AND p.dcp_publicstatus IN ('Approved', 'Withdrawn') THEN 'archive'
     END AS tab,
     lup.dcp_project AS project_id,
     lup.dcp_project AS dcp_name,
@@ -25,7 +31,12 @@ WITH lups_project_assignments AS (
   INNER JOIN -- inner because not all projects should be visible to users based on visibility field in "where" clause
     dcp_project AS p ON lup.dcp_project = p.dcp_projectid
   INNER JOIN -- inner because we only want certain milestones with the status included in the "where" clause
-    dcp_projectmilestone AS mm ON lup.dcp_project = mm.dcp_project
+    (SELECT * FROM dcp_projectmilestone WHERE statuscode <> 'Overridden') AS mm ON lup.dcp_project = mm.dcp_project
+  LEFT JOIN
+    dcp_communityboarddisposition AS disp
+    ON disp.dcp_project = lup.dcp_project
+    AND disp.dcp_recommendationsubmittedby = '${id:value}' -- plugs in contactid
+    AND disp.dcp_representing = lup.dcp_lupteammemberrole
   WHERE
     lup.dcp_lupteammember = '${id:value}' -- plugs in contactid
     AND p.dcp_visibility = 'General Public'
@@ -86,15 +97,15 @@ SELECT
         'hearing_location', disp.dcp_publichearinglocation,
         'vote_date', disp.dcp_dateofvote,
         'vote_location', disp.dcp_votelocation,
-        -- 'vote_infavor', disp.dcp_votinginfavorrecommendation,
-        -- 'vote_against', disp.dcp_votingagainstrecommendation,
-        -- 'vote_abstained', disp.dcp_votingabstainingonrecommendation,
-        -- 'vote_total_appointed', disp.dcp_totalmembersappointedtotheboard,
+        'vote_infavor', disp.dcp_votinginfavorrecommendation,
+        'vote_against', disp.dcp_votingagainstrecommendation,
+        'vote_abstained', disp.dcp_votingabstainingonrecommendation,
+        'vote_total_appointed', disp.dcp_totalmembersappointedtotheboard,
         'vote_quorum', disp.dcp_wasaquorumpresent,
         'rec_bb', disp.dcp_boroughboardrecommendation,
         'rec_cb', disp.dcp_communityboardrecommendation,
         'rec_bp', disp.dcp_boroughpresidentrecommendation
-        -- 'rec_comment', disp.dcp_consideration
+        'rec_comment', disp.dcp_consideration
       )
     )
     FROM dcp_communityboarddisposition AS disp
