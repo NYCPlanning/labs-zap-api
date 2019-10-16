@@ -1,6 +1,7 @@
 import * as pgp from 'pg-promise';
 import { generateDynamicQuery } from './generate-dynamic-sql';
 import { getQueryFile } from './get-query-file';
+import { Logger } from '@nestjs/common';
 
 // import sql query templates
 const listProjectsQuery = getQueryFile('/projects/index.sql');
@@ -40,7 +41,7 @@ export function buildProjectsSQL(req, type = 'filter') {
     // user-specific filters
     // defaults to null because filtering on this
     // requires authentication
-    project_lup_status = null, // 'to-review'
+    project_lup_status = 'reviewed', // 'to-review'
   } = query;
 
   // special handling for FEMA flood zones
@@ -80,13 +81,14 @@ export function buildProjectsSQL(req, type = 'filter') {
   const paginate = generateDynamicQuery(paginateQuery, { itemsPerPage, offset: (page - 1) * itemsPerPage });
 
   if (type === 'filter') {
-    const { contactid } = session;
+    // const { contactid } = session;
+    const contactid = '2a231d14-693e-e811-8133-1458d04d06c0';
 
     // we have different queries for LUPP things
     if (project_lup_status && contactid) {
       // one of 'archive', 'reviewed', 'to-review', 'upcoming'
       if (!['archive', 'reviewed', 'to-review', 'upcoming'].includes(project_lup_status)) {
-        throw new Error('Must be one of archive, reviewed, to-review, upcoming');
+        throw new Error('Must be one of archive, reviewed, to-review, upcoming. Got:' + project_lup_status);
       }
 
       return pgp.as.format(userProjectsQuery, {

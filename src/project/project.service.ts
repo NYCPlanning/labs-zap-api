@@ -57,7 +57,7 @@ export class ProjectService {
 
   // TODO: Use the ORM for this instead of buildProjectsSQL
   async queryProjects(request: Request) {
-    const projects = await this.projectRepository.query(buildProjectsSQL(request));
+    const projects = await this.projectRepository.query(buildProjectsSQL(request, 'filter'));
     let meta = extractMeta(projects);
 
     const { query: { page = '1' } } = request;

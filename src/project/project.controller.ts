@@ -12,6 +12,7 @@ import { Request } from 'express';
 import { ProjectService } from './project.service';
 import { TilesService } from './tiles/tiles.service';
 import { GeometriesService } from './geometries/geometries.service';
+import { Logger } from '@nestjs/common';
 
 @Controller('projects')
 export class ProjectController {
