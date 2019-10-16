@@ -2,14 +2,16 @@
 WITH lups_project_assignments AS (
   SELECT DISTINCT
     CASE
-      WHEN mm.statuscode = 'In Progress' THEN 'to-review'
-      WHEN mm.statuscode = 'Not Started' THEN 'upcoming'
+      WHEN mm.statuscode IN ('Completed', 'Overridden') AND p.dcp_publicstatus IN ('Approved', 'Withdrawn') THEN 'archive'
       WHEN
         (mm.statuscode IN ('Completed', 'Overridden') AND p.dcp_publicstatus NOT IN ('Approved', 'Withdrawn'))
-        OR (mm.statuscode = 'In Progress' AND COALESCE(COALESCE(disp.dcp_boroughpresidentrecommendation), COALESCE(disp.dcp_boroughboardrecommendation), COALESCE(disp.dcp_communityboardrecommendation)) IS NOT NULL)
+        OR (mm.statuscode = 'In Progress' AND lup.dcp_lupteammemberrole = 'BP' AND COALESCE(disp.dcp_boroughpresidentrecommendation) IS NOT NULL)
+        OR (mm.statuscode = 'In Progress' AND lup.dcp_lupteammemberrole = 'BB' AND COALESCE(disp.dcp_boroughboardrecommendation) IS NOT NULL)
+        OR (mm.statuscode = 'In Progress' AND lup.dcp_lupteammemberrole = 'CB' AND COALESCE(disp.dcp_communityboardrecommendation) IS NOT NULL)
         THEN 'reviewed'
         -- note: if we allow users to save progress and do partial submissions in the future, we will need to replace these coalesces
-      WHEN mm.statuscode IN ('Completed', 'Overridden') AND p.dcp_publicstatus IN ('Approved', 'Withdrawn') THEN 'archive'
+      WHEN mm.statuscode = 'In Progress' THEN 'to-review'
+      WHEN mm.statuscode = 'Not Started' THEN 'upcoming'
     END AS tab,
     lup.dcp_project AS project_id,
     lup.dcp_project AS dcp_name,
@@ -94,15 +96,15 @@ SELECT
         'hearing_location', disp.dcp_publichearinglocation,
         'vote_date', disp.dcp_dateofvote,
         'vote_location', disp.dcp_votelocation,
-        -- 'vote_infavor', disp.dcp_votinginfavorrecommendation,
-        -- 'vote_against', disp.dcp_votingagainstrecommendation,
-        -- 'vote_abstained', disp.dcp_votingabstainingonrecommendation,
-        -- 'vote_total_appointed', disp.dcp_totalmembersappointedtotheboard,
+        'vote_infavor', disp.dcp_votinginfavorrecommendation,
+        'vote_against', disp.dcp_votingagainstrecommendation,
+        'vote_abstained', disp.dcp_votingabstainingonrecommendation,
+        'vote_total_appointed', disp.dcp_totalmembersappointedtotheboard,
         'vote_quorum', disp.dcp_wasaquorumpresent,
         'rec_bb', disp.dcp_boroughboardrecommendation,
         'rec_cb', disp.dcp_communityboardrecommendation,
         'rec_bp', disp.dcp_boroughpresidentrecommendation
-        -- 'rec_comment', disp.dcp_consideration
+        'rec_comment', disp.dcp_consideration
       )
     )
     FROM dcp_communityboarddisposition AS disp
