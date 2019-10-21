@@ -1,13 +1,12 @@
 import * as pgp from 'pg-promise';
 import { generateDynamicQuery } from './generate-dynamic-sql';
-import { getQueryFile } from './get-query-file';
+import { getQueryFile } from '../../_utils/get-query-file';
 
 // import sql query templates
 const listProjectsQuery = getQueryFile('/projects/index.sql');
 const paginateQuery = getQueryFile('/helpers/paginate.sql');
 const standardColumns = getQueryFile('/helpers/standard-projects-columns.sql');
 const spatialColumns = getQueryFile('/helpers/shp-projects-columns.sql');
-const userProjectsQuery = getQueryFile('/projects/lup-projects.sql');
 
 export function buildProjectsSQL(req, type = 'filter') {
   const {
@@ -81,19 +80,6 @@ export function buildProjectsSQL(req, type = 'filter') {
 
   if (type === 'filter') {
     const { contactid } = session;
-
-    // we have different queries for LUPP things
-    if (project_lup_status && contactid) {
-      // one of 'archive', 'reviewed', 'to-review', 'upcoming'
-      if (!['archive', 'reviewed', 'to-review', 'upcoming'].includes(project_lup_status)) {
-        throw new Error('Must be one of archive, reviewed, to-review, upcoming');
-      }
-
-      return pgp.as.format(userProjectsQuery, {
-        id: contactid,
-        status: project_lup_status,
-      });
-    }
 
     return pgp.as.format(listProjectsQuery, {
       standardColumns,

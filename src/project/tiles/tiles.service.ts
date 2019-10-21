@@ -7,7 +7,7 @@ import * as SphericalMercator from 'sphericalmercator';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as pgp from 'pg-promise';
 import { Project } from '../project.entity';
-import { getQueryFile } from '../_utils/get-query-file';
+import { getQueryFile } from '../../_utils/get-query-file';
 
 const generateVectorTile = getQueryFile('/helpers/generate-vector-tile.sql');
 
