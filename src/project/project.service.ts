@@ -11,7 +11,7 @@ import { injectSupportDocumentURLs } from './_utils/inject-supporting-document-u
 import { bbox, buffer, point } from '@turf/turf';
 import { ConfigService } from '../config/config.service';
 import { TilesService } from './tiles/tiles.service';
-import { getQueryFile } from './_utils/get-query-file';
+import { getQueryFile } from '../_utils/get-query-file';
 import { buildProjectsSQL } from './_utils/build-projects-sql';
 import { Project } from './project.entity';
 

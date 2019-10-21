@@ -40,6 +40,7 @@ const { deserialize } = new Deserializer({
 });
 
 // todo: auth (decorator)
+// auth that user is assigned to dispo
 @Controller('dispositions')
 export class DispositionController {
   constructor(

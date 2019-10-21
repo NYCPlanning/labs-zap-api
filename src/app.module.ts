@@ -13,6 +13,8 @@ import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
 import { DispositionModule } from './disposition/disposition.module';
 import { OdataModule } from './odata/odata.module';
+import { AssignmentController } from './assignment/assignment.controller';
+import { AssignmentModule } from './assignment/assignment.module';
 
 @Module({
   imports: [
@@ -32,6 +34,7 @@ import { OdataModule } from './odata/odata.module';
     AuthModule,
     DispositionModule,
     OdataModule,
+    AssignmentModule,
    ],
   providers: [AppService],
   controllers: [AppController],
