@@ -259,7 +259,94 @@ SELECT
         display_sequence,
         display_date
     ) AS m
-  ) AS milestones
+  ) AS milestones,
+  (
+    SELECT row_to_json(project_row) FROM (
+
+      SELECT
+        dcp_name,
+        dcp_projectid,
+        dcp_projectname,
+        dcp_projectbrief,
+        dcp_borough,
+        dcp_communitydistricts,
+        dcp_ulurp_nonulurp,
+        dcp_leaddivision,
+        dcp_ceqrtype,
+        dcp_ceqrnumber,
+        dcp_easeis,
+        dcp_leadagencyforenvreview,
+        dcp_alterationmapnumber,
+        dcp_sischoolseat,
+        dcp_sisubdivision,
+        dcp_previousactiononsite,
+        dcp_wrpnumber,
+        dcp_nydospermitnumber,
+        dcp_bsanumber,
+        dcp_lpcnumber,
+        dcp_decpermitnumber,
+        dcp_femafloodzonea,
+        dcp_femafloodzonecoastala,
+        dcp_femafloodzonecoastala,
+        dcp_femafloodzonev,
+        CASE
+          WHEN dcp_publicstatus = 'Filed' THEN 'Filed'
+          WHEN dcp_publicstatus = 'Certified' THEN 'In Public Review'
+          WHEN dcp_publicstatus = 'Approved' THEN 'Completed'
+          WHEN dcp_publicstatus = 'Withdrawn' THEN 'Completed'
+          ELSE 'Unknown'
+        END AS dcp_publicstatus_simp,
+        (
+          SELECT json_agg(b.dcp_bblnumber)
+          FROM dcp_projectbbl b
+          WHERE b.dcp_project = sub_project.dcp_projectid
+          AND b.dcp_bblnumber IS NOT NULL AND statuscode = 'Active'
+        ) AS bbls,
+        (
+          SELECT ST_ASGeoJSON(b.polygons, 6)
+          FROM project_geoms b
+          WHERE b.projectid = sub_project.dcp_name
+        ) AS bbl_multipolygon,
+        (
+          SELECT json_agg(dcp_keyword.dcp_keyword)
+          FROM dcp_projectkeywords k
+          LEFT JOIN dcp_keyword ON k.dcp_keyword = dcp_keyword.dcp_keywordid
+          WHERE k.dcp_project = sub_project.dcp_projectid AND k.statuscode ='Active'
+        ) AS keywords,
+        (
+          SELECT json_agg(
+            json_build_object(
+              'role', pa.dcp_applicantrole,
+              'name', CASE WHEN pa.dcp_name IS NOT NULL THEN pa.dcp_name ELSE account.name END
+            )
+          )
+          FROM (
+            SELECT *
+            FROM dcp_projectapplicant
+            WHERE dcp_project = sub_project.dcp_projectid
+              AND dcp_applicantrole IN ('Applicant', 'Co-Applicant')
+              AND statuscode = 'Active'
+            ORDER BY dcp_applicantrole ASC
+          ) pa
+          LEFT JOIN account
+            ON account.accountid = pa.dcp_applicant_customer
+        ) AS applicantteam,
+        (
+          SELECT json_agg(json_build_object(
+            'dcp_validatedaddressnumber', a.dcp_validatedaddressnumber,
+            'dcp_validatedstreet', a.dcp_validatedstreet
+          ))
+          FROM dcp_projectaddress a
+          WHERE a.dcp_project = sub_project.dcp_projectid
+            AND (dcp_validatedaddressnumber IS NOT NULL AND dcp_validatedstreet IS NOT NULL AND statuscode = 'Active')
+        ) AS addresses
+      FROM dcp_project sub_project
+      WHERE dcp_name = p.dcp_name
+        AND dcp_visibility = 'General Public'
+
+    ) project_row
+  ) as project
+
 FROM lups_project_assignments AS lup
 LEFT JOIN
   dcp_project AS p ON p.dcp_projectid = lup.project_id
