@@ -24,6 +24,7 @@ SELECT
   dcp_femafloodzonecoastala,
   dcp_femafloodzonecoastala,
   dcp_femafloodzonev,
+  dcp_projectcompleted,
   CASE
     WHEN dcp_publicstatus = 'Filed' THEN 'Filed'
     WHEN dcp_publicstatus = 'Certified' THEN 'In Public Review'
