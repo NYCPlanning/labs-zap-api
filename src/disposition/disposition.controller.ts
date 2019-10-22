@@ -11,6 +11,7 @@ import { pick } from 'underscore';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Disposition } from './disposition.entity';
+import { ConfigService } from '../config/config.service';
 import { OdataService } from '../odata/odata.service';
 
 // Only attrs in the whitelist get posted
@@ -47,6 +48,7 @@ export class DispositionController {
     @InjectRepository(Disposition)
     private readonly dispositionRepository: Repository<Disposition>,
     private readonly dynamicsWebApi:OdataService,
+    private readonly config: ConfigService,
   ) {}
 
   @Patch('/:id')
@@ -60,7 +62,9 @@ export class DispositionController {
     try {
       await this.dynamicsWebApi.update('dcp_communityboarddispositions', id, whitelistedAttrs);
 
-      await this.dispositionRepository.update(id, whitelistedAttrs);
+      if (!this.config.get('SKIP_PG')) {
+        await this.dispositionRepository.update(id, whitelistedAttrs);
+      }
     } catch (e) {
       const message = await e;
 
