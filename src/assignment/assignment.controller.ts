@@ -44,6 +44,18 @@ export class AssignmentController {
       project: {
         ref: 'dcp_name',
         attributes: Object.keys(project),
+        actions: {
+          ref(project, action) {
+            return `${project.dcp_name}-${action.actioncode}`;
+          },
+          attributes: Object.keys(project.actions[0] || {}),
+        },
+        milestones: {
+          ref(project, milestone) {
+            return `${project.dcp_name}-${milestone.dcp_milestone}`;
+          },
+          attributes: Object.keys(project.milestones[0] || {}),
+        },
       },
       ...(milestone ? {
         milestones: {
