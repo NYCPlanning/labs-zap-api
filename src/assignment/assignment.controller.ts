@@ -56,6 +56,10 @@ export class AssignmentController {
           },
           attributes: Object.keys(project.milestones[0] || {}),
         },
+        dispositions: {
+          ref: 'id',
+          attributes: Object.keys(project.dispositions[0] || {}),
+        },
       },
       ...(milestone ? {
         milestones: {

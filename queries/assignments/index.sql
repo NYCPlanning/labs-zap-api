@@ -619,11 +619,44 @@ SELECT
               display_sequence,
               display_date
           ) AS m
-        ) AS milestones
+        ) AS milestones,
+        (
+          SELECT json_agg(
+            json_build_object(
+              'dcp_publichearinglocation', disp.dcp_publichearinglocation,
+              'dcp_dateofpublichearing', disp.dcp_dateofpublichearing,
+              'dcp_boroughpresidentrecommendation', disp.dcp_boroughpresidentrecommendation,
+              'dcp_boroughboardrecommendation', disp.dcp_boroughboardrecommendation,
+              'dcp_communityboardrecommendation', disp.dcp_communityboardrecommendation,
+              'dcp_consideration', disp.dcp_consideration,
+              'dcp_votelocation', disp.dcp_votelocation,
+              'dcp_datereceived', disp.dcp_datereceived,
+              'dcp_dateofvote', disp.dcp_dateofvote,
+              'statecode', disp.statecode,
+              'statuscode', disp.statuscode,
+              'dcp_docketdescription', disp.dcp_docketdescription,
+              'dcp_votinginfavorrecommendation', disp.dcp_votinginfavorrecommendation,
+              'dcp_votingagainstrecommendation', disp.dcp_votingagainstrecommendation,
+              'dcp_votingabstainingonrecommendation', disp.dcp_votingabstainingonrecommendation,
+              'dcp_totalmembersappointedtotheboard', disp.dcp_totalmembersappointedtotheboard,
+              'dcp_wasaquorumpresent', disp.dcp_wasaquorumpresent,
+              'recommendationsubmittedby', disp.dcp_recommendationsubmittedby,
+              'representing', disp.dcp_representing,
+              'dateofpublichearing', disp.dcp_dateofpublichearing,
+              'boroughboardrecommendation', disp.dcp_boroughboardrecommendation,
+              'communityboardrecommendation', disp.dcp_communityboardrecommendation,
+              'boroughpresidentrecommendation', disp.dcp_boroughpresidentrecommendation,
+              'dcp_projectaction', disp.dcp_projectaction,
+              'id', disp.dcp_communityboarddispositionid
+            )
+          )
+          FROM dcp_communityboarddisposition AS disp
+          WHERE
+            disp.dcp_project = p.dcp_projectid
+        ) AS dispositions
       FROM dcp_project sub_project
       WHERE dcp_name = p.dcp_name
         AND dcp_visibility = 'General Public'
-
     ) project_row
   ) as project
 
