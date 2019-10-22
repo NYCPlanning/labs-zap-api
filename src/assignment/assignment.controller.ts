@@ -48,17 +48,17 @@ export class AssignmentController {
           ref(project, action) {
             return `${project.dcp_name}-${action.actioncode}`;
           },
-          attributes: Object.keys(project.actions[0] || {}),
+          attributes: Object.keys((project.actions || [])[0] || {}),
         },
         milestones: {
           ref(project, milestone) {
             return `${project.dcp_name}-${milestone.dcp_milestone}`;
           },
-          attributes: Object.keys(project.milestones[0] || {}),
+          attributes: Object.keys((project.milestones || [])[0] || {}),
         },
         dispositions: {
           ref: 'id',
-          attributes: Object.keys(project.dispositions[0] || {}),
+          attributes: Object.keys((project.dispositions || [])[0] || {}),
         },
       },
       ...(milestone ? {
