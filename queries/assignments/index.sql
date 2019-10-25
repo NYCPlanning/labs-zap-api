@@ -2,9 +2,9 @@
 WITH lups_project_assignments AS (
   SELECT DISTINCT
     CASE
-      WHEN mm.statuscode = 'Completed' AND p.dcp_publicstatus IN ('Approved', 'Withdrawn') THEN 'archive'
+      WHEN mm.statuscode = 'Completed' AND p.dcp_publicstatus IN ('Approved', 'Withdrawn/Terminated/Disapproved', 'Disapproved') THEN 'archive'
       WHEN
-        (mm.statuscode = 'Completed' AND p.dcp_publicstatus NOT IN ('Approved', 'Withdrawn'))
+        (mm.statuscode = 'Completed' AND p.dcp_publicstatus NOT IN ('Approved', 'Withdrawn/Terminated/Disapproved', 'Disapproved'))
         OR (mm.statuscode = 'In Progress' AND lup.dcp_lupteammemberrole = 'BP' AND COALESCE(disp.dcp_boroughpresidentrecommendation) IS NOT NULL)
         OR (mm.statuscode = 'In Progress' AND lup.dcp_lupteammemberrole = 'BB' AND COALESCE(disp.dcp_boroughboardrecommendation) IS NOT NULL)
         OR (mm.statuscode = 'In Progress' AND lup.dcp_lupteammemberrole = 'CB' AND COALESCE(disp.dcp_communityboardrecommendation) IS NOT NULL)
@@ -12,8 +12,8 @@ WITH lups_project_assignments AS (
         -- note: if we allow users to save progress and do partial submissions in the future, we will need to replace these coalesces
       WHEN mm.statuscode = 'In Progress' THEN 'to-review'
       WHEN mm.statuscode = 'Not Started' THEN 'upcoming'
-      WHEN mm.statuscode IN ('Completed', 'Overridden') AND p.dcp_publicstatus NOT IN ('Approved', 'Withdrawn') THEN 'reviewed'
-      WHEN mm.statuscode IN ('Completed', 'Overridden') AND p.dcp_publicstatus IN ('Approved', 'Withdrawn') THEN 'archive'
+      WHEN mm.statuscode IN ('Completed', 'Overridden') AND p.dcp_publicstatus NOT IN ('Approved', 'Withdrawn/Terminated/Disapproved') THEN 'reviewed'
+      WHEN mm.statuscode IN ('Completed', 'Overridden') AND p.dcp_publicstatus IN ('Approved', 'Withdrawn/Terminated/Disapproved') THEN 'archive'
     END AS tab,
     lup.dcp_project AS project_id,
     lup.dcp_project AS dcp_name,
@@ -305,9 +305,10 @@ SELECT
         dcp_projectcompleted,
         CASE
           WHEN dcp_publicstatus = 'Filed' THEN 'Filed'
-          WHEN dcp_publicstatus = 'Certified' THEN 'In Public Review'
+          WHEN dcp_publicstatus = 'Certified/Referred' THEN 'In Public Review'
           WHEN dcp_publicstatus = 'Approved' THEN 'Completed'
-          WHEN dcp_publicstatus = 'Withdrawn' THEN 'Completed'
+          WHEN dcp_publicstatus = 'Disapproved' THEN 'Completed'
+          WHEN dcp_publicstatus = 'Withdrawn/Terminated/Disapproved' THEN 'Completed'
           ELSE 'Unknown'
         END AS dcp_publicstatus_simp,
         (
