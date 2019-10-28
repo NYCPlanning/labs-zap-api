@@ -35,12 +35,13 @@ WITH lups_project_assignments AS (
   INNER JOIN -- inner because we only want certain milestones with the status included in the "where" clause
     (SELECT * FROM dcp_projectmilestone WHERE statuscode <> 'Overridden') AS mm ON lup.dcp_project = mm.dcp_project
   LEFT JOIN
-    dcp_communityboarddisposition AS disp
+    (SELECT * FROM dcp_communityboarddisposition WHERE dcp_visibility IN ('General Public', 'LUP') AND statuscode <> 'Deactivated') AS disp
     ON disp.dcp_project = lup.dcp_project
     AND disp.dcp_recommendationsubmittedby = '${id:value}' -- plugs in contactid
     AND disp.dcp_representing = lup.dcp_lupteammemberrole
   WHERE
     lup.dcp_lupteammember = '${id:value}' -- plugs in contactid
+    AND lup.statuscode = 'Active'
     AND p.dcp_visibility = 'General Public'
     AND (
       (mm.dcp_milestone = '923beec4-dad0-e711-8116-1458d04e2fb8' AND lup.dcp_lupteammemberrole = 'CB')
