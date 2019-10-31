@@ -105,7 +105,7 @@ LEFT JOIN (
   FROM dcp_projectapplicant pa
   LEFT JOIN account
   ON account.accountid = pa.dcp_applicant_customer
-  WHERE dcp_applicantrole IN ('Applicant', 'Co-Applicant')
+  WHERE dcp_applicantrole IN ('Applicant', 'Co-Applicant', 'Primary Applicant')
   AND pa.statuscode = 'Active'
   ORDER BY dcp_applicantrole ASC
 ) applicantteams
