@@ -22,7 +22,6 @@ describe('ContactService', () => {
           useClass: Repository,
         },
       ],
-      exports: [ContactService],
     }).compile();
 
     service = module.get<ContactService>(ContactService);
