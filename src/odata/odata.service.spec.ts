@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigModule } from '../config/config.module';
 import { OdataService } from './odata.service';
 
 describe('OdataService', () => {
@@ -6,6 +7,7 @@ describe('OdataService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [ConfigModule],
       providers: [OdataService],
     }).compile();
 
