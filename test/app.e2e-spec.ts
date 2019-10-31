@@ -86,76 +86,6 @@ describe('AppController (e2e)', () => {
 
   describe('Projects', () => {
     describe('Filtering and searching', () => {
-      // TODO make work
-      // it('accepts different filtering options', async () => {
-      //   const appServer = app.getHttpServer();
-
-      //   // primitive-type filters
-      //   //  string
-      //   await request(appServer)
-      //     .get('/projects?project_applicant_text=test')
-      //     .expect(200);
-      //   await request(appServer)
-      //     .get('/projects?block=test')
-      //     .expect(200);
-      //   await request(appServer)
-      //     .get('/projects?project_lup_status=test')
-      //     .expect(200);
-
-      //   //  numeric
-      //   await request(appServer)
-      //     .get('/projects?itemsPerPage=1')
-      //     .expect(200);
-      //   await request(appServer)
-      //     .get('/projects?radius_from_point=1')
-      //     .expect(200);
-      //   await request(appServer)
-      //     .get('/projects?page=1')
-      //     .expect(200);
-
-      //   //  boolean
-      //   await request(appServer)
-      //     .get('/projects?dcp_femafloodzonev=false')
-      //     .expect(200);
-      //   await request(appServer)
-      //     .get('/projects?dcp_femafloodzonecoastala=false')
-      //     .expect(200);
-      //   await request(appServer)
-      //     .get('/projects?dcp_femafloodzonea=false')
-      //     .expect(200);
-      //   await request(appServer)
-      //     .get('/projects?dcp_femafloodzoneshadedx=false')
-      //     .expect(200);
-
-      //   // // enumerable list filters
-      //   //  string
-      //   await request(appServer)
-      //     .get('/projects?community-districts[]=""')
-      //     .expect(200);
-      //   await request(appServer)
-      //     .get('/projects?action-types[]=""')
-      //     .expect(200);
-      //   await request(appServer)
-      //     .get('/projects?boroughs[]=""')
-      //     .expect(200);
-      //   await request(appServer)
-      //     .get('/projects?dcp_ceqrtype[]=""')
-      //     .expect(200);
-      //   await request(appServer)
-      //     .get('/projects?dcp_ulurp_nonulurp[]=""')
-      //     .expect(200);
-      //   await request(appServer)
-      //     .get('/projects?dcp_publicstatus[]=""')
-      //     .expect(200);
-      //   await request(appServer)
-      //     .get('/projects?dcp_certifiedreferred[]=""')
-      //     .expect(200);
-
-      //   //  numeric
-      //   return request(appServer)
-      //     .get('/projects?distance_from_point[]=1')
-      //     .expect(200);
-      // });
     });
 
     describe('Map tiles', () => {
@@ -191,6 +121,51 @@ describe('AppController (e2e)', () => {
         .set('Cookie', token)
         .expect(200);
     });
+  });
+
+  describe('Document Upload', () => {
+
+    // If this fails, it may be due to the project entity setup being changed in UAT2.
+    // For example, if the project entity 2020K0121 is deleted, since this test uploads to that 
+    // project entity. This test overwrites the file test.txt
+    test('User can upload a single document to a Project 2020K0121', async () => {
+      const server = app.getHttpServer();
+      const token = extractJWT(await doLogin(server, request));
+
+      // mock a file that says "buffer"
+      const file = Buffer.from([0x62, 0x75, 0x66, 0x66, 0x65, 0x72]);
+
+      return request(server)
+        .post('/document')
+        .type('form')
+        .attach('file', file, 'test.txt')
+        .field('instanceName', '2020K0121')
+        .field('entityName', 'dcp_project')
+        .set('Cookie', token)
+        .expect(200)
+        .expect({ message: 'Uploaded document successfully.' });
+    });
+
+    // If this fails, it may be due to the disposition entity setup being changed in UAT2.
+    // For example, if the disposition entity '2020K0121 - ZC - BK CB3  ' is deleted, since this test uploads to that 
+    // project entity. This test overwrites the file test.txt
+    test('User can upload a single document to a Disposition `2020K0121 - ZC - BK CB3  `', async () => {
+      const server = app.getHttpServer();
+      const token = extractJWT(await doLogin(server, request));
+
+      // mock a file that says "buffer"
+      const file = Buffer.from([0x62, 0x75, 0x66, 0x66, 0x65, 0x72]);
+
+      return request(server)
+        .post('/document')
+        .type('form')
+        .attach('file', file, 'test.txt')
+        .field('instanceName', '2020K0121 - ZC - BK CB3  ') // trailing spaces required
+        .field('entityName', 'dcp_communityboarddisposition')
+        .set('Cookie', token)
+        .expect(200)
+        .expect({ message: 'Uploaded document successfully.' });
+      });
   });
 
   afterAll(async () => {
