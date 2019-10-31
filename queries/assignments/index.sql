@@ -1,5 +1,5 @@
 -- first, get the list of assigned projects, roles, and statuses for the specific LUP contact
-WITH lups_project_assignments AS (
+WITH lups_project_assignments_all AS (
   SELECT DISTINCT
     CASE
       WHEN mm.statuscode = 'Completed' AND p.dcp_publicstatus IN ('Approved', 'Withdrawn/Terminated/Disapproved', 'Disapproved') THEN 'archive'
@@ -48,7 +48,17 @@ WITH lups_project_assignments AS (
       OR (mm.dcp_milestone = '943beec4-dad0-e711-8116-1458d04e2fb8' AND lup.dcp_lupteammemberrole = 'BP')
       OR (mm.dcp_milestone = '963beec4-dad0-e711-8116-1458d04e2fb8' AND lup.dcp_lupteammemberrole = 'BB')
     )
-)
+),
+
+-- we only want to see the BB assignment card for to-review projects and post-cert projects in upcoming
+lups_project_assignments_filtered AS (
+  SELECT *
+  FROM lups_project_assignments_all
+  WHERE
+    dcp_lupteammemberrole <> 'BB'
+    OR (dcp_lupteammemberrole = 'BB' AND tab = 'upcoming' AND dcp_publicstatus = 'Certified/Referred')
+    OR (dcp_lupteammemberrole = 'BB' AND tab = 'to-review')
+),
 
 -- using the list of projects assigned to that contact, get additional attributes at the project level
 SELECT
@@ -663,7 +673,7 @@ SELECT
     ) project_row
   ) as project
 
-FROM lups_project_assignments AS lup
+FROM lups_project_assignments_filtered AS lup
 LEFT JOIN
   dcp_project AS p ON p.dcp_projectid = lup.project_id
 WHERE tab = '${status:value}'
