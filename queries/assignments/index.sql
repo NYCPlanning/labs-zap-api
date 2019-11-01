@@ -64,7 +64,7 @@ SELECT
       SELECT *
       FROM dcp_projectapplicant
       WHERE dcp_project = p.dcp_projectid
-        AND dcp_applicantrole IN ('Applicant', 'Co-Applicant')
+        AND dcp_applicantrole IN ('Applicant', 'Co-Applicant', 'Primary Applicant')
         AND statuscode = 'Active'
       ORDER BY dcp_applicantrole ASC
     ) pa
@@ -340,7 +340,7 @@ SELECT
             SELECT *
             FROM dcp_projectapplicant
             WHERE dcp_project = sub_project.dcp_projectid
-              AND dcp_applicantrole IN ('Applicant', 'Co-Applicant')
+              AND dcp_applicantrole IN ('Applicant', 'Co-Applicant', 'Primary Applicant')
               AND statuscode = 'Active'
             ORDER BY dcp_applicantrole ASC
           ) pa
