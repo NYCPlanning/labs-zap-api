@@ -11,15 +11,7 @@ import { Repository } from 'typeorm';
     TypeOrmModule.forFeature([Contact]),
     ConfigModule,
   ],
-  providers: [
-    ContactService,
-    {
-      // how you provide the injection token in a test instance
-      provide: getRepositoryToken(Contact),
-      // as a class value, Repository needs no generics
-      useClass: Repository,
-    },
-  ],
+  providers: [ContactService],
   exports: [ContactService],
 })
 export class ContactModule {}
