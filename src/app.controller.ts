@@ -12,12 +12,21 @@ export class AppController {
     private readonly contactService: ContactService,
   ) {}
 
+  @Get('/')
+  root() {
+    return {};
+  }
+
   @Get('/login')
   async login(@Res() res: Response, @Query('accessToken') token: string) {
-    const ZAPToken = await this.authService.handleLogin(token);
+    try {
+      const ZAPToken = await this.authService.handleLogin(token);
 
-    res.cookie('token', ZAPToken, { httpOnly: true })
-      .send({ message: 'Login successful!' });
+      res.cookie('token', ZAPToken, { httpOnly: true })
+        .send({ message: 'Login successful!' });
+    } catch (e) {
+      res.status(401).send({ errors: e });
+    }
   }
 
   @Get('/users')
@@ -29,9 +38,9 @@ export class AppController {
       res.status(401).send({
         errors: ['Authentication required for this route'],
       });
+    } else {
+      res.send(this.serialize(contact));
     }
-
-    res.send(this.serialize(contact));
   }
 
   // Serializes an array of objects into a JSON:API document

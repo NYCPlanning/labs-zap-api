@@ -11,6 +11,10 @@ export class AuthService {
   ) {}
 
   async handleLogin(token): Promise<string> {
+    if (!token) {
+      throw new Error(`No token provided`);
+    }
+
     const secret = this.config.get('CRM_SIGNING_SECRET');
 
     // Development option to force return of a specific CRM ID
