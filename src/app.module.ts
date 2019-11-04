@@ -1,6 +1,6 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import * as cookieparser from 'cookie-parser';
 import { AuthMiddleware } from './auth.middleware';
-import { AppService } from './app.service';
 import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -36,11 +36,14 @@ import { AssignmentModule } from './assignment/assignment.module';
     OdataModule,
     AssignmentModule,
    ],
-  providers: [AppService],
   controllers: [AppController],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(cookieparser())
+      .forRoutes('*');
+
     consumer
       .apply(AuthMiddleware)
       .forRoutes('*');

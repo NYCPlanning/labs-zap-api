@@ -1,6 +1,5 @@
 import { NestFactory } from '@nestjs/core';
 import * as compression from 'compression';
-import * as cookieparser from 'cookie-parser';
 import * as bodyParser from 'body-parser';
 import { AppModule } from './app.module';
 
@@ -17,7 +16,7 @@ async function bootstrap() {
   });
 
   app.use(compression());
-  app.use(cookieparser());
+  // app.use(cookieparser());
   app.use(bodyParser.json({
     type: 'application/vnd.api+json'
   }));
