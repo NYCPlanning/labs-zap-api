@@ -58,7 +58,7 @@ lups_project_assignments_filtered AS (
     dcp_lupteammemberrole <> 'BB'
     OR (dcp_lupteammemberrole = 'BB' AND tab = 'upcoming' AND dcp_publicstatus = 'Certified/Referred')
     OR (dcp_lupteammemberrole = 'BB' AND tab = 'to-review')
-),
+)
 
 -- using the list of projects assigned to that contact, get additional attributes at the project level
 SELECT
