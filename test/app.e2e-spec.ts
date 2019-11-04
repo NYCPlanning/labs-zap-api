@@ -60,20 +60,6 @@ describe('AppController (e2e)', () => {
     });
 
     it('runs /login with accessToken and provides a new token', () => {
-      // the signing secret arg here is copied from the test.env file
-      // this should be dealt with in a different way...
-      const mockJWT = jwt.sign({
-        mail: 'rsinger@planning.nyc.gov',
-        exp: 1565932329 * 100,
-      }, 'test');
-
-      return request(app.getHttpServer())
-        .get(`/login?accessToken=${mockJWT}`)
-        .expect(200)
-        .expect({ message: 'Login successful!' });
-    });
-
-    it('runs /login with accessToken and provides a new token', () => {
       return doLogin(app.getHttpServer(), request)
         .expect(200)
         .expect({ message: 'Login successful!' });
@@ -100,6 +86,7 @@ describe('AppController (e2e)', () => {
 
   describe('Projects', () => {
     describe('Filtering and searching', () => {
+      // TODO make work
       // it('accepts different filtering options', async () => {
       //   const appServer = app.getHttpServer();
 
@@ -194,7 +181,16 @@ describe('AppController (e2e)', () => {
 
   describe('LUPP Dashboard — User assignments', () => {
     test.todo('prevents unauthorized access to /assignments');
-    test.todo('allows for a "tab" query param');
+
+    test('allows for a "tab" query param', async () => {
+      const server = app.getHttpServer();
+      const token = extractJWT(await doLogin(server, request));
+
+      return request(server)
+        .get('/assignments?include=project.milestones%2Cproject.dispositions%2Cproject.actions&tab=to-review')
+        .set('Cookie', token)
+        .expect(200);
+    });
   });
 
   afterAll(async () => {
