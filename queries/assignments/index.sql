@@ -16,26 +16,23 @@ WITH lups_project_assignments_all AS (
       WHEN mm.statuscode IN ('Completed', 'Overridden') AND p.dcp_publicstatus IN ('Approved', 'Withdrawn/Terminated/Disapproved') THEN 'archive'
     END AS tab,
     lup.dcp_project AS project_id,
-    lup.dcp_project AS dcp_name,
-    lup.dcp_name AS lup_name,
-    lup.dcp_lupteammemberrole AS dcp_lupteammemberrole,
-    p.dcp_publicstatus,
-    p.dcp_projectname,
-    p.dcp_projectbrief,
-    p.dcp_name,
-    p.dcp_ulurp_nonulurp,
-    mm.dcp_actualstartdate AS actualstartdate,
-    mm.dcp_actualenddate AS actualenddate,
-    mm.dcp_plannedstartdate AS plannedstartdate,
-    mm.dcp_plannedcompletiondate AS plannedcompletiondate
+    lup.dcp_lupteammemberrole AS dcp_lupteammemberrole
   FROM
     dcp_projectlupteam AS lup
   INNER JOIN -- inner because not all projects should be visible to users based on visibility field in "where" clause
-    dcp_project AS p ON lup.dcp_project = p.dcp_projectid
-  INNER JOIN -- inner because we only want certain milestones with the status included in the "where" clause
-    (SELECT * FROM dcp_projectmilestone WHERE statuscode <> 'Overridden') AS mm ON lup.dcp_project = mm.dcp_project
-  LEFT JOIN
-    (SELECT * FROM dcp_communityboarddisposition WHERE dcp_visibility IN ('General Public', 'LUP') AND statuscode <> 'Deactivated') AS disp
+    dcp_project AS p
+    ON lup.dcp_project = p.dcp_projectid
+  INNER JOIN  -- inner because we only want certain milestones with the status included in the "where" clause
+    (SELECT * FROM dcp_projectmilestone WHERE statuscode <> 'Overridden') AS mm
+    ON lup.dcp_project = mm.dcp_project
+  LEFT JOIN (
+      SELECT *
+      FROM dcp_communityboarddisposition
+      WHERE
+        dcp_visibility IN ('General Public', 'LUP')
+        AND statecode = 'Active'
+        AND statuscode <> 'Deactivated'
+      ) AS disp
     ON disp.dcp_project = lup.dcp_project
     AND disp.dcp_recommendationsubmittedby = '${id:value}' -- plugs in contactid
     AND disp.dcp_representing = lup.dcp_lupteammemberrole
@@ -126,6 +123,9 @@ SELECT
     WHERE
       disp.dcp_project = p.dcp_projectid
       AND disp.dcp_recommendationsubmittedby = '${id:value}' -- plugs in contactid
+      AND dcp_visibility IN ('General Public', 'LUP')
+      AND statecode = 'Inactive'
+      AND statuscode <> 'Deactivated'
   ) AS dispositions,
   (
     SELECT json_agg(json_build_object(
@@ -286,7 +286,6 @@ SELECT
   ) AS milestones,
   (
     SELECT row_to_json(project_row) FROM (
-
       SELECT
         dcp_name,
         dcp_projectid,
@@ -314,6 +313,7 @@ SELECT
         dcp_femafloodzonecoastala,
         dcp_femafloodzonev,
         dcp_projectcompleted,
+        dcp_publicstatus,
         CASE
           WHEN dcp_publicstatus = 'Filed' THEN 'Filed'
           WHEN dcp_publicstatus = 'Certified/Referred' THEN 'In Public Review'
