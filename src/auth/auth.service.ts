@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { 
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '../config/config.service';
 import { ContactService } from '../contact/contact.service';
@@ -23,9 +27,9 @@ export class AuthService {
     const { mail, exp } = this.validateNYCIDToken(token);
     let { contactid } = await this.contactService.findOne(CRM_IMPOSTER_ID || { emailaddress1: mail });
 
-    // todo: handle these errors
+    // Contact returned, but has no ID
     if (!contactid) {
-      throw new Error(`No CRM Contact found for email ${mail}`);
+      throw new HttpException('Contact is unusable.', HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     return jwt.sign({ exp, contactid }, secret);
