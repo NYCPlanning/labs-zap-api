@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { 
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '../config/config.service';
@@ -13,6 +17,10 @@ export class ContactService {
   ) {}
 
   async findOne(opts: any) {
-    return this.contactRepository.findOne(opts);
+    let contact = await this.contactRepository.findOne(opts);
+    if (!contact) {
+      throw new HttpException('Contact not found', HttpStatus.BAD_REQUEST);
+    }
+    return contact;
   }
 }
