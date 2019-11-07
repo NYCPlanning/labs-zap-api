@@ -110,7 +110,11 @@ describe('AppController (e2e)', () => {
   });
 
   describe('LUPP Dashboard — User assignments', () => {
-    test.todo('prevents unauthorized access to /assignments');
+    test('prevents unauthorized access to /assignments', async () => {
+      return request(app.getHttpServer())
+        .get('/assignments')
+        .expect(401);
+    });
 
     test('allows for a "tab" query param', async () => {
       const server = app.getHttpServer();

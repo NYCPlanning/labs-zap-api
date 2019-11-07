@@ -1,5 +1,5 @@
 import * as pgp from 'pg-promise';
-import { Controller, Get, Query, Session } from '@nestjs/common';
+import { Controller, Get, Query, Session, HttpException, HttpStatus } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 import { Serializer } from 'jsonapi-serializer';
 import { getQueryFile } from '../_utils/get-query-file';
@@ -13,6 +13,8 @@ export class AssignmentController {
   async index(@Query() query, @Session() session) {
     const { contactid } = session;
     const { tab = 'to-review' } = query;
+
+    if (!contactid) throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
 
     // we have different queries for LUPP things
     if (tab && contactid) {

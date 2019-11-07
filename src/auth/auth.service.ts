@@ -48,6 +48,12 @@ export class AuthService {
   }
 
   validateToken(token, secret): any {
+    // this should happen in the service
+
+    if (!token) {
+      throw new Error('No token provided');
+    }
+
     const CRM_IMPOSTER_ID = this.config.get('CRM_IMPOSTER_ID');
 
     if (this.config.get('SKIP_AUTH')) return {
