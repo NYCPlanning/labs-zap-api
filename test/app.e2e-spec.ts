@@ -1,37 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import * as jwt from 'jsonwebtoken';
-import { Project } from '../src/project/project.entity';
 import { AppModule } from './../src/app.module';
-
-// Test helpers
-const doLogin = (appServer, request) => {
-  // the signing secret arg here is copied from the test.env file
-  // this should be dealt with in a different way...
-  const mockJWT = jwt.sign({
-    mail: 'rsinger@planning.nyc.gov',
-    exp: 1565932329 * 100,
-  }, 'test');
-
-  return request(appServer)
-    .get(`/login?accessToken=${mockJWT}`)
-}
-
-const extractJWT = (response): string => {
-  try { 
-    // seems like the actual cookie is always the second in the array
-    const { header: { 'set-cookie': [, token] } } = response;
-
-    return token;
-  } catch (e) {
-    console.log(e);
-
-    throw new Error(`Could not destructure. Is the server response working?`);
-  }
-}
+import { doLogin } from './helpers/do-login';
+import { extractJWT } from './helpers/extract-jwt';
 
 describe('AppController (e2e)', () => {
   let app;
@@ -121,51 +92,6 @@ describe('AppController (e2e)', () => {
         .set('Cookie', token)
         .expect(200);
     });
-  });
-
-  describe('Document Upload', () => {
-
-    // If this fails, it may be due to the project entity setup being changed in UAT2.
-    // For example, if the project entity 2020K0121 is deleted, since this test uploads to that 
-    // project entity. This test overwrites the file test.txt
-    test('User can upload a single document to a Project 2020K0121', async () => {
-      const server = app.getHttpServer();
-      const token = extractJWT(await doLogin(server, request));
-
-      // mock a file that says "buffer"
-      const file = Buffer.from([0x62, 0x75, 0x66, 0x66, 0x65, 0x72]);
-
-      return request(server)
-        .post('/document')
-        .type('form')
-        .attach('file', file, 'test.txt')
-        .field('instanceName', '2020K0121')
-        .field('entityName', 'dcp_project')
-        .set('Cookie', token)
-        .expect(200)
-        .expect({ message: 'Uploaded document successfully.' });
-    });
-
-    // If this fails, it may be due to the disposition entity setup being changed in UAT2.
-    // For example, if the disposition entity '2020K0121 - ZC - BK CB3  ' is deleted, since this test uploads to that 
-    // project entity. This test overwrites the file test.txt
-    test('User can upload a single document to a Disposition `2020K0121 - ZC - BK CB3  `', async () => {
-      const server = app.getHttpServer();
-      const token = extractJWT(await doLogin(server, request));
-
-      // mock a file that says "buffer"
-      const file = Buffer.from([0x62, 0x75, 0x66, 0x66, 0x65, 0x72]);
-
-      return request(server)
-        .post('/document')
-        .type('form')
-        .attach('file', file, 'test.txt')
-        .field('instanceName', '2020K0121 - ZC - BK CB3  ') // trailing spaces required
-        .field('entityName', 'dcp_communityboarddisposition')
-        .set('Cookie', token)
-        .expect(200)
-        .expect({ message: 'Uploaded document successfully.' });
-      });
   });
 
   afterAll(async () => {
