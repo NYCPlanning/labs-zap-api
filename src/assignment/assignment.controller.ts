@@ -13,7 +13,7 @@ export class AssignmentController {
   async index(@Query() query, @Session() session) {
     const { contactid } = session;
     const { tab = 'to-review' } = query;
-
+    console.log(contactid);
     // we have different queries for LUPP things
     if (tab && contactid) {
       // one of 'archive', 'reviewed', 'to-review', 'upcoming'
