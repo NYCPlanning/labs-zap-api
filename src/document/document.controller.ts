@@ -26,7 +26,7 @@ export class DocumentController {
   */
   @Post('/')
   @UseInterceptors(FileInterceptor('file'))
-  async index(@UploadedFile() file, @Req() request: Request, @Res() response){
+  async index(@UploadedFile() file, @Req() request: Request, @Res() response) {
     const {
       body: {
         instanceName,
