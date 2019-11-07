@@ -15,12 +15,6 @@ async function bootstrap() {
     },
   });
 
-  app.use(compression());
-  // app.use(cookieparser());
-  app.use(bodyParser.json({
-    type: 'application/vnd.api+json'
-  }));
-
   await app.listen(process.env.PORT || 3000);
 }
 

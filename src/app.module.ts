@@ -1,5 +1,7 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import * as bodyParser from 'body-parser';
 import * as cookieparser from 'cookie-parser';
+import * as compression from 'compression';
 import { AuthMiddleware } from './auth.middleware';
 import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
@@ -48,6 +50,16 @@ export class AppModule implements NestModule {
 
     consumer
       .apply(AuthMiddleware)
+      .forRoutes('*');
+
+    consumer
+      .apply(bodyParser.json({
+        type: 'application/vnd.api+json'
+      }))
+      .forRoutes('*');
+
+    consumer
+      .apply(compression())
       .forRoutes('*');
   }
 }
