@@ -1,13 +1,35 @@
 -- first, get the list of assigned projects, roles, and statuses for the specific LUP contact
+
 WITH lups_project_assignments_all AS (
   SELECT DISTINCT
     CASE
       WHEN mm.statuscode = 'Completed' AND p.dcp_publicstatus IN ('Approved', 'Withdrawn/Terminated/Disapproved', 'Disapproved') THEN 'archive'
       WHEN
         (mm.statuscode = 'Completed' AND p.dcp_publicstatus NOT IN ('Approved', 'Withdrawn/Terminated/Disapproved', 'Disapproved'))
-        OR (mm.statuscode = 'In Progress' AND lup.dcp_lupteammemberrole = 'BP' AND COALESCE(disp.dcp_boroughpresidentrecommendation) IS NOT NULL)
-        OR (mm.statuscode = 'In Progress' AND lup.dcp_lupteammemberrole = 'BB' AND COALESCE(disp.dcp_boroughboardrecommendation) IS NOT NULL)
-        OR (mm.statuscode = 'In Progress' AND lup.dcp_lupteammemberrole = 'CB' AND COALESCE(disp.dcp_communityboardrecommendation) IS NOT NULL)
+        OR (
+          mm.statuscode = 'In Progress'
+          AND lup.dcp_lupteammemberrole = 'BP'
+          AND COALESCE(disp.dcp_boroughpresidentrecommendation) IS NOT NULL
+          AND COALESCE(disp.statecode) = 'Active'
+          AND COALESCE(disp.dcp_visibility) IN ('General Public', 'LUP')
+          AND COALESCE(disp.statuscode) <> 'Deactivated'
+        )
+        OR (
+          mm.statuscode = 'In Progress'
+          AND lup.dcp_lupteammemberrole = 'BB'
+          AND COALESCE(disp.dcp_boroughboardrecommendation) IS NOT NULL
+          AND COALESCE(disp.statecode) = 'Active'
+          AND COALESCE(disp.dcp_visibility) IN ('General Public', 'LUP')
+          AND COALESCE(disp.statuscode) <> 'Deactivated'
+        )
+        OR (
+          mm.statuscode = 'In Progress'
+          AND lup.dcp_lupteammemberrole = 'CB'
+          AND COALESCE(disp.dcp_communityboardrecommendation) IS NOT NULL
+          AND COALESCE(disp.statecode) = 'Active'
+          AND COALESCE(disp.dcp_visibility) IN ('General Public', 'LUP')
+          AND COALESCE(disp.statuscode) <> 'Deactivated'
+        )
         THEN 'reviewed'
         -- note: if we allow users to save progress and do partial submissions in the future, we will need to replace these coalesces
       WHEN mm.statuscode = 'In Progress' THEN 'to-review'
