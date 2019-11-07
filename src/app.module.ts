@@ -15,6 +15,7 @@ import { DispositionModule } from './disposition/disposition.module';
 import { OdataModule } from './odata/odata.module';
 import { AssignmentController } from './assignment/assignment.controller';
 import { AssignmentModule } from './assignment/assignment.module';
+import { DocumentModule } from './document/document.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { AssignmentModule } from './assignment/assignment.module';
     DispositionModule,
     OdataModule,
     AssignmentModule,
+    DocumentModule,
    ],
   controllers: [AppController],
 })

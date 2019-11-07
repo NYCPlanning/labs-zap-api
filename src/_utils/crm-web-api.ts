@@ -34,13 +34,19 @@ export const CRMWebAPI = {
     return value;
   },
 
-  parseErrorMessage: async function (json) {
-    if (json && json.error) return json.error;
-
+  parseErrorMessage: function (json) {
+    if (json) {
+      if (json.error) {
+        return json.error;
+      }
+      if (json._error) {
+        return json._error;
+      }
+    }
     return "Error";
   },
 
-  fixLongODataAnnotations: async function (dataObj) {
+  fixLongODataAnnotations: function (dataObj) {
     const newObj = {};
 
     for (let name in dataObj) {
@@ -108,7 +114,7 @@ export const CRMWebAPI = {
                 // retrieve multiple
                 var array = [];
                 for (var i = 0; i < result.value.length; i++) {
-                    array.push(this.fixLongODataAnnotations(result.value[i]));
+                  array.push(this.fixLongODataAnnotations(result.value[i]));
                 }
                 result.value = array;
             }
@@ -319,13 +325,22 @@ export const CRMWebAPI = {
     });
   },
 
+  /**
+   * Finds location id for folder for specific instance of an entity
+   * @param { GUID } entityID - a 32 character id, in format xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+   * @param { string } folderName - Instance folder name, which usually has the format
+   * '<entity.dcp_name>_<entity.dcp_[entity]id>'. Note that whitespace SHOULD NOT* be trimmed off of
+   * dcp_name.
+   * *Should not because we still need to more thoroughly verify this.
+   * e.g. '2018Q0147 - Tax Map(s) - 1_D2A818330BF0E911A997001DD832112G'
+  */
   findDocumentLocation: function (entityID, folderName) {
     const fetchDocumentLocationXML = [
       `<fetch mapping="logical" distinct="true" top="1">`,
       `<entity name="sharepointdocumentlocation">`,
       `<attribute name="sharepointdocumentlocationid"/>`,
       `<filter type="and">`,
-      `<condition attribute="regardingobjectid" operator="eq" value="{${entityID}}"/>`,
+      `<condition attribute="regardingobjectid" operator="eq" value="${entityID}"/>`,
       `<condition attribute="locationtype" operator="eq" value="0"/>`,
       `<condition attribute="servicetype" operator="eq" value="0"/>`,
       `<condition attribute="relativeurl" operator="eq" value="${folderName}"/>`,
@@ -345,13 +360,20 @@ export const CRMWebAPI = {
       })
   },
 
+  /** 
+    * Finds folder for an entity (like `dcp_project` or `dcp_communityboarddisposition`).
+    * Entity folders contain many instance folders, the paths of which can be 
+    * acquired instead via findDocumentLocation.
+    * @param { GUID } entityName - name of CRM entity, like  `dcp_project` or `dcp_communityboarddisposition`.
+    * @param { string } sharepointSiteID - ID of CRM's corresponding sharepoint site. Use getParentSiteLocation() to acquire this ID
+  */
   findEntityDocumentLocation: function (entityName, sharepointSiteID) {
     const fetchDocumentLocationXML = [
       `<fetch mapping="logical" distinct="true" top="1">`,
       `<entity name="sharepointdocumentlocation">`,
       `<attribute name="name"/>`,
       `<filter type="and">`,
-      `<condition attribute="parentsiteorlocation" operator="eq" value="{${sharepointSiteID}}"/>`,
+      `<condition attribute="parentsiteorlocation" operator="eq" value="${sharepointSiteID}"/>`,
       `<condition attribute="locationtype" operator="eq" value="0"/>`,
       `<condition attribute="servicetype" operator="eq" value="0"/>`,
       `<condition attribute="relativeurl" operator="eq" value="${entityName}"/>`,
@@ -371,6 +393,8 @@ export const CRMWebAPI = {
       })
   },
 
+  // Use to get ID of current CRM's corresponding sharepoint site ID,
+  // i.e. "sharepointSiteID" required in findEntityDocumentLocation()
   getParentSiteLocation: async function () {
     const fetchParentSiteLocationIdXML = [
       `<fetch mapping="logical" distinct="false" top="1">`,
@@ -448,12 +472,24 @@ export const CRMWebAPI = {
     });
   },
 
+
+  /**
+   * @param { string } entityName - (required) Entity name like `dcp_project` or `dcp_communityboarddisposition`
+   * @param { string } entityID - (required) a 32 character id, in format xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+   * @param { string } folderName - (required) name of folder for entity instance. e.g '2018Q0147 - Tax Map(s) - 1_D2A818330BF0E911A997001DD832112G'
+   * This needs to be constructed by attaching the instance `dcp_name` to a formatted instance guid 
+   * (for projects, it is `dcp_projectid`; for dispositions, it is `dcp_communityboarddispositionid`).
+   * @param { string } fileName - Desired name of the file.
+   * @param { string } base64File - base64 encoded buffer
+   * @param { Boolean } overwriteExisting - Whether to overwrite existing file
+   * @param { Object } headers - Object with key-value pairs to attach to the POST header. Should include the MSCRMCallerID.
+   * The `entityID` and `folderName` parameters can be acquired and constructed by making separate requests to the API.
+   */
   uploadDocument: async function (entityName, entityID, folderName, fileName, base64File, overwriteExisting, headers) {
     let docLocation = await this.findDocumentLocation(entityID, folderName);
     let docLocationID = null;
 
     if(!docLocation){
-      console.log("LocationID not found");
       const parentSiteLocation = await this.getParentSiteLocation();
       if(!parentSiteLocation) throw new Error('Sharepoint Site Location not found');
       const sharepointSiteID = parentSiteLocation['sharepointsiteid'];
@@ -467,7 +503,7 @@ export const CRMWebAPI = {
       entityRef[entityName+"id"] = entityID;
 
       docLocationID = await this.createDocumentLocation(entityDocName, absoluteURL, folderName, sharepointSiteID, entityRef, headers);
-    }else{
+    } else {
       docLocationID = docLocation.sharepointdocumentlocationid;
     }
 
@@ -500,24 +536,28 @@ export const CRMWebAPI = {
     };
 
       return new Promise((resolve, reject) => {
-          request.post(options, (error, response, body) => {
-            if(body){
-              try{
-                const jsonBody = JSON.parse(body);
-                if(jsonBody.error){
-                  reject(this.parseErrorMessage(jsonBody));
-                }
-                else{
-                  resolve();
-                }
-              }catch(error){
-                reject(body);
+        request.post(options, (error, response, body) => {
+          if (response.statusCode === 403) {
+            resolve("Forbidden.");
+          }
+          if (response.statusCode === 204) {
+            resolve("Uploaded document successfully.")
+          }
+          // If response body exists, 
+          // allow CRM error message to bubble up.
+          if (body) {
+            try {
+              const jsonBody = JSON.parse(body);
+              const parsedErrorMessage = this.parseErrorMessage(jsonBody);
+              if (parsedErrorMessage) {
+                // Nest was throwing server Errors on Promise.reject()?
+                resolve(parsedErrorMessage);
               }
+            } catch(error) {
+              reject(body);
             }
-            else{
-              resolve();
-            }
-          });
+          }
+        });
       });
   },
 
