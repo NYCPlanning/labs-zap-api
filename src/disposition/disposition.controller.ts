@@ -75,6 +75,7 @@ export class DispositionController {
       }, 400);
     }
 
+    console.log('body bananas', body);
     return body;
   }
 }

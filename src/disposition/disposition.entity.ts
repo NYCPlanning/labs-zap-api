@@ -15,6 +15,9 @@ export class Disposition {
   dcp_ispublichearingrequired: string;
 
   @Column()
+  dcp_recommendationsubmittedbyname: string;
+
+  @Column()
   form_completer_name: string;
 
   @Column()
