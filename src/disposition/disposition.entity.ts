@@ -12,6 +12,9 @@ export class Disposition {
   dcp_dateofpublichearing: string;
 
   @Column()
+  dcp_ispublichearingrequired: string;
+
+  @Column()
   form_completer_name: string;
 
   @Column()
