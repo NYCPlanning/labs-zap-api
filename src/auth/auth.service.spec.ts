@@ -16,7 +16,9 @@ describe('AuthService', () => {
         {
           provide: ConfigService,
           // how you provide the injection token in a test instance
-          useValue: new (class Mock { }),
+          useValue: new (class Mock {
+            get() {}
+          }),
         },
         {
           provide: ContactService,

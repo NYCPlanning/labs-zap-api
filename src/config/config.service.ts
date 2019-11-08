@@ -17,7 +17,7 @@ export class ConfigService {
     }
   }
 
-  get(key: string): string {
+  get(key: string): any {
     return this.envConfig[key];
   }
 }

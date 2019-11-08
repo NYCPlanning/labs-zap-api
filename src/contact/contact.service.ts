@@ -16,11 +16,7 @@ export class ContactService {
     private readonly config: ConfigService,
   ) {}
 
-  async findOne(opts: any) {
-    let contact = await this.contactRepository.findOne(opts);
-    if (!contact) {
-      throw new HttpException('Contact not found', HttpStatus.BAD_REQUEST);
-    }
-    return contact;
+  async findOne(opts: any): Promise<Contact> {
+    return this.contactRepository.findOneOrFail(opts);
   }
 }
