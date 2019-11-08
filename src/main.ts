@@ -1,6 +1,4 @@
 import { NestFactory } from '@nestjs/core';
-import * as compression from 'compression';
-import * as bodyParser from 'body-parser';
 import { AppModule } from './app.module';
 
 declare const module: any;

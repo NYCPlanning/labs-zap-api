@@ -360,9 +360,9 @@ export const CRMWebAPI = {
       })
   },
 
-  /** 
+  /**
     * Finds folder for an entity (like `dcp_project` or `dcp_communityboarddisposition`).
-    * Entity folders contain many instance folders, the paths of which can be 
+    * Entity folders contain many instance folders, the paths of which can be
     * acquired instead via findDocumentLocation.
     * @param { GUID } entityName - name of CRM entity, like  `dcp_project` or `dcp_communityboarddisposition`.
     * @param { string } sharepointSiteID - ID of CRM's corresponding sharepoint site. Use getParentSiteLocation() to acquire this ID
@@ -477,7 +477,7 @@ export const CRMWebAPI = {
    * @param { string } entityName - (required) Entity name like `dcp_project` or `dcp_communityboarddisposition`
    * @param { string } entityID - (required) a 32 character id, in format xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
    * @param { string } folderName - (required) name of folder for entity instance. e.g '2018Q0147 - Tax Map(s) - 1_D2A818330BF0E911A997001DD832112G'
-   * This needs to be constructed by attaching the instance `dcp_name` to a formatted instance guid 
+   * This needs to be constructed by attaching the instance `dcp_name` to a formatted instance guid
    * (for projects, it is `dcp_projectid`; for dispositions, it is `dcp_communityboarddispositionid`).
    * @param { string } fileName - Desired name of the file.
    * @param { string } base64File - base64 encoded buffer
@@ -543,7 +543,7 @@ export const CRMWebAPI = {
           if (response.statusCode === 204) {
             resolve("Uploaded document successfully.")
           }
-          // If response body exists, 
+          // If response body exists,
           // allow CRM error message to bubble up.
           if (body) {
             try {
