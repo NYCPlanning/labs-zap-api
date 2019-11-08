@@ -74,10 +74,13 @@ lups_dispositions AS (
 lups_project_assignments_with_tab AS (
   SELECT
     CASE
-      WHEN projects_public_statuses.dcp_publicstatus IN ('Approved', 'Withdrawn/Terminated/Disapproved', 'Disapproved') THEN 'archive'
+      WHEN
+        projects_public_statuses.dcp_publicstatus IN ('Approved', 'Withdrawn/Terminated/Disapproved', 'Disapproved')
+        THEN 'archive'
       WHEN
         lups_review_milestones.statuscode = 'Not Started'
-        OR projects_public_statuses.dcp_publicstatus = 'Filed' THEN 'upcoming'
+        OR projects_public_statuses.dcp_publicstatus = 'Filed'
+        THEN 'upcoming'
       WHEN
         lups_review_milestones.statuscode IN ('In Progress', 'Completed')
         AND projects_public_statuses.dcp_publicstatus NOT IN ('Approved', 'Withdrawn/Terminated/Disapproved', 'Disapproved')
@@ -90,7 +93,6 @@ lups_project_assignments_with_tab AS (
         AND lups_dispositions.statecode = 'Inactive'
         AND lups_dispositions.statuscode IN ('Submitted', 'Not Submitted')
         THEN 'reviewed'
-      WHEN lups_review_milestones.statuscode IN ('Completed', 'Overridden') AND projects_public_statuses.dcp_publicstatus NOT IN ('Approved', 'Withdrawn/Terminated/Disapproved') THEN 'reviewed'
     END AS tab,
     lups_project_assignments_all.*,
     -- note: the following attributes aren't used in the assignment model; they're only included to help verify that the tab logic is correct
