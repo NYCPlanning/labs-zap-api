@@ -1,59 +1,123 @@
 -- first, get the list of assigned projects, roles, and statuses for the specific LUP contact
 WITH lups_project_assignments_all AS (
   SELECT DISTINCT
-    CASE
-      WHEN mm.statuscode = 'Completed' AND p.dcp_publicstatus IN ('Approved', 'Withdrawn/Terminated/Disapproved', 'Disapproved') THEN 'archive'
-      WHEN
-        (mm.statuscode = 'Completed' AND p.dcp_publicstatus NOT IN ('Approved', 'Withdrawn/Terminated/Disapproved', 'Disapproved'))
-        OR (mm.statuscode = 'In Progress' AND lup.dcp_lupteammemberrole = 'BP' AND COALESCE(disp.dcp_boroughpresidentrecommendation) IS NOT NULL)
-        OR (mm.statuscode = 'In Progress' AND lup.dcp_lupteammemberrole = 'BB' AND COALESCE(disp.dcp_boroughboardrecommendation) IS NOT NULL)
-        OR (mm.statuscode = 'In Progress' AND lup.dcp_lupteammemberrole = 'CB' AND COALESCE(disp.dcp_communityboardrecommendation) IS NOT NULL)
-        THEN 'reviewed'
-        -- note: if we allow users to save progress and do partial submissions in the future, we will need to replace these coalesces
-      WHEN mm.statuscode = 'In Progress' THEN 'to-review'
-      WHEN mm.statuscode = 'Not Started' THEN 'upcoming'
-      WHEN mm.statuscode IN ('Completed', 'Overridden') AND p.dcp_publicstatus NOT IN ('Approved', 'Withdrawn/Terminated/Disapproved') THEN 'reviewed'
-      WHEN mm.statuscode IN ('Completed', 'Overridden') AND p.dcp_publicstatus IN ('Approved', 'Withdrawn/Terminated/Disapproved') THEN 'archive'
-    END AS tab,
-    lup.dcp_project AS project_id,
-    lup.dcp_project AS dcp_name,
-    lup.dcp_name AS lup_name,
-    lup.dcp_lupteammemberrole AS dcp_lupteammemberrole,
-    p.dcp_publicstatus,
-    p.dcp_projectname,
-    p.dcp_projectbrief,
-    p.dcp_name,
-    p.dcp_ulurp_nonulurp,
-    mm.dcp_actualstartdate AS actualstartdate,
-    mm.dcp_actualenddate AS actualenddate,
-    mm.dcp_plannedstartdate AS plannedstartdate,
-    mm.dcp_plannedcompletiondate AS plannedcompletiondate
+    CONCAT(dcp_lupteammemberrole,'-',dcp_project) AS assignmentid,
+    dcp_project,
+    dcp_lupteammemberrole
   FROM
-    dcp_projectlupteam AS lup
-  INNER JOIN -- inner because not all projects should be visible to users based on visibility field in "where" clause
-    dcp_project AS p ON lup.dcp_project = p.dcp_projectid
-  INNER JOIN -- inner because we only want certain milestones with the status included in the "where" clause
-    (SELECT * FROM dcp_projectmilestone WHERE statuscode <> 'Overridden') AS mm ON lup.dcp_project = mm.dcp_project
-  LEFT JOIN
-    (SELECT * FROM dcp_communityboarddisposition WHERE dcp_visibility IN ('General Public', 'LUP') AND statuscode <> 'Deactivated') AS disp
-    ON disp.dcp_project = lup.dcp_project
-    AND disp.dcp_recommendationsubmittedby = '${id:value}' -- plugs in contactid
-    AND disp.dcp_representing = lup.dcp_lupteammemberrole
+    dcp_projectlupteam
   WHERE
-    lup.dcp_lupteammember = '${id:value}' -- plugs in contactid
-    AND lup.statuscode = 'Active'
-    AND p.dcp_visibility = 'General Public'
+    dcp_lupteammember = '${id:value}' -- plugs in contactid
+    AND statuscode = 'Active'
+),
+
+-- get the public status of the LUP's assigned projects
+projects_public_statuses AS (
+  SELECT
+    dcp_projectid,
+    dcp_publicstatus
+  FROM
+    dcp_project
+  WHERE
+    dcp_projectid IN (SELECT DISTINCT dcp_project FROM lups_project_assignments_all)
+    AND dcp_visibility = 'General Public'
+),
+
+-- get the corresponding milestones for the LUP's reviews
+lups_review_milestones AS (
+  SELECT
+    lups_project_assignments_all.*,
+    dcp_projectmilestone.*
+  FROM
+    lups_project_assignments_all,
+    dcp_projectmilestone
+  WHERE
+    dcp_projectmilestone.statuscode <> 'Overridden'
+    AND dcp_projectmilestone.dcp_project = lups_project_assignments_all.dcp_project
     AND (
-      (mm.dcp_milestone = '923beec4-dad0-e711-8116-1458d04e2fb8' AND lup.dcp_lupteammemberrole = 'CB')
-      OR (mm.dcp_milestone = '943beec4-dad0-e711-8116-1458d04e2fb8' AND lup.dcp_lupteammemberrole = 'BP')
-      OR (mm.dcp_milestone = '963beec4-dad0-e711-8116-1458d04e2fb8' AND lup.dcp_lupteammemberrole = 'BB')
+      (dcp_projectmilestone.dcp_milestone = '923beec4-dad0-e711-8116-1458d04e2fb8' AND lups_project_assignments_all.dcp_lupteammemberrole = 'CB')
+      OR (dcp_projectmilestone.dcp_milestone = '943beec4-dad0-e711-8116-1458d04e2fb8' AND lups_project_assignments_all.dcp_lupteammemberrole = 'BP')
+      OR (dcp_projectmilestone.dcp_milestone = '963beec4-dad0-e711-8116-1458d04e2fb8' AND lups_project_assignments_all.dcp_lupteammemberrole = 'BB')
     )
 ),
 
--- we only want to see the BB assignment card for to-review projects and post-cert projects in upcoming
+-- get the LUP's dispositions for their assigned projects and roles
+lups_dispositions_status AS (
+  SELECT
+    lups_project_assignments_all.*,
+    dcp_communityboarddisposition.dcp_visibility AS dcp_visibility,
+    dcp_communityboarddisposition.statecode AS statecode,
+    dcp_communityboarddisposition.statuscode AS statuscode
+  FROM
+    lups_project_assignments_all,
+    dcp_communityboarddisposition
+  WHERE
+    dcp_communityboarddisposition.statuscode <> 'Deactivated'
+    AND dcp_communityboarddisposition.dcp_visibility IN ('General Public', 'LUP')
+    AND dcp_communityboarddisposition.dcp_project = lups_project_assignments_all.dcp_project
+    AND dcp_communityboarddisposition.dcp_recommendationsubmittedby = '${id:value}' -- plugs in contactid
+    AND (
+      (dcp_communityboarddisposition.dcp_representing = 'Borough President' AND lups_project_assignments_all.dcp_lupteammemberrole = 'BP')
+      OR (dcp_communityboarddisposition.dcp_representing = 'Borough Board' AND lups_project_assignments_all.dcp_lupteammemberrole = 'BB')
+      OR (dcp_communityboarddisposition.dcp_representing = 'Community Board' AND lups_project_assignments_all.dcp_lupteammemberrole = 'CB')
+    )
+  GROUP BY
+    dcp_communityboarddisposition.dcp_visibility,
+    dcp_communityboarddisposition.statecode,
+    dcp_communityboarddisposition.statuscode,
+    lups_project_assignments_all.dcp_project,
+    lups_project_assignments_all.dcp_lupteammemberrole,
+    lups_project_assignments_all.assignmentid
+),
+
+-- join all the tables onto the lups_project_assignments and determine which "tab" each assignment belongs on
+lups_project_assignments_with_tab AS (
+  SELECT
+    CASE
+      WHEN
+        projects_public_statuses.dcp_publicstatus IN ('Approved', 'Withdrawn/Terminated/Disapproved', 'Disapproved')
+        THEN 'archive'
+      WHEN
+        lups_review_milestones.statuscode = 'Not Started'
+        OR projects_public_statuses.dcp_publicstatus = 'Filed'
+        THEN 'upcoming'
+      WHEN
+        lups_review_milestones.statuscode IN ('In Progress', 'Completed')
+        AND projects_public_statuses.dcp_publicstatus NOT IN ('Approved', 'Withdrawn/Terminated/Disapproved', 'Disapproved')
+        AND lups_dispositions_status.statecode = 'Active'
+        AND lups_dispositions_status.statuscode IN ('Draft', 'Saved')
+        THEN 'to-review'
+      WHEN
+        lups_review_milestones.statuscode IN ('In Progress', 'Completed')
+        AND projects_public_statuses.dcp_publicstatus NOT IN ('Approved', 'Withdrawn/Terminated/Disapproved', 'Disapproved')
+        AND lups_dispositions_status.statecode = 'Inactive'
+        AND lups_dispositions_status.statuscode IN ('Submitted', 'Not Submitted')
+        THEN 'reviewed'
+    END AS tab,
+    lups_project_assignments_all.*,
+    -- note: the following attributes aren't used in the assignment model; they're only included to help verify that the tab logic is correct
+    projects_public_statuses.dcp_publicstatus,
+    lups_review_milestones.statuscode AS milestone_statuscode,
+    lups_dispositions_status.dcp_visibility AS disp_dcp_visibility,
+    lups_dispositions_status.statecode AS disp_statecode,
+    lups_dispositions_status.statuscode AS disp_statuscode
+  FROM
+    lups_project_assignments_all
+  INNER JOIN -- inner because we only want projects that are visible to public
+    projects_public_statuses ON lups_project_assignments_all.dcp_project = projects_public_statuses.dcp_projectid
+  LEFT JOIN
+    lups_dispositions_status ON lups_project_assignments_all.assignmentid = lups_dispositions_status.assignmentid
+  LEFT JOIN
+    lups_review_milestones ON lups_project_assignments_all.assignmentid = lups_review_milestones.assignmentid
+),
+
+-- filter the previous table; we only want to see the BB assignment card for to-review projects and post-cert projects in upcoming
 lups_project_assignments_filtered AS (
-  SELECT *
-  FROM lups_project_assignments_all
+  SELECT
+    dcp_lupteammemberrole,
+    dcp_project AS project_id,
+    tab
+  FROM lups_project_assignments_with_tab
   WHERE
     dcp_lupteammemberrole <> 'BB'
     OR (dcp_lupteammemberrole = 'BB' AND tab = 'upcoming' AND dcp_publicstatus = 'Certified/Referred')
@@ -96,7 +160,7 @@ SELECT
         'dcp_datereceived', disp.dcp_datereceived,
         'dcp_dateofvote', disp.dcp_dateofvote,
         'statecode', disp.statecode,
-        'statuscode', disp.statuscode,
+        'statuscode', disp.statuscode, -- this will be used to determine visibility for the public
         'dcp_docketdescription', disp.dcp_docketdescription,
         'dcp_votinginfavorrecommendation', disp.dcp_votinginfavorrecommendation,
         'dcp_votingagainstrecommendation', disp.dcp_votingagainstrecommendation,
@@ -127,6 +191,8 @@ SELECT
     WHERE
       disp.dcp_project = p.dcp_projectid
       AND disp.dcp_recommendationsubmittedby = '${id:value}' -- plugs in contactid
+      AND disp.dcp_visibility IN ('General Public', 'LUP')
+      AND disp.statuscode <> 'Deactivated'
   ) AS dispositions,
   (
     SELECT json_agg(json_build_object(
@@ -287,7 +353,6 @@ SELECT
   ) AS milestones,
   (
     SELECT row_to_json(project_row) FROM (
-
       SELECT
         dcp_name,
         dcp_projectid,
@@ -315,6 +380,7 @@ SELECT
         dcp_femafloodzonecoastala,
         dcp_femafloodzonev,
         dcp_projectcompleted,
+        dcp_publicstatus,
         CASE
           WHEN dcp_publicstatus = 'Filed' THEN 'Filed'
           WHEN dcp_publicstatus = 'Certified/Referred' THEN 'In Public Review'
@@ -654,6 +720,9 @@ SELECT
               'dcp_votingabstainingonrecommendation', disp.dcp_votingabstainingonrecommendation,
               'dcp_totalmembersappointedtotheboard', disp.dcp_totalmembersappointedtotheboard,
               'dcp_wasaquorumpresent', disp.dcp_wasaquorumpresent,
+              'dcp_projectaction', disp.dcp_projectaction,
+              'dcp_name', pact.dcp_name,
+              'dcp_ulurpnumber', pact.dcp_ulurpnumber,
               'recommendationsubmittedby', disp.dcp_recommendationsubmittedby,
               'representing', disp.dcp_representing,
               'dateofpublichearing', disp.dcp_dateofpublichearing,
@@ -665,8 +734,12 @@ SELECT
             )
           )
           FROM dcp_communityboarddisposition AS disp
+          LEFT JOIN dcp_projectaction AS pact ON disp.dcp_projectaction = pact.dcp_action
           WHERE
+            -- note: we want to get all dispositions, but we only want to show the public ones WHERE statuscode IN ('Saved', 'Submitted')
             disp.dcp_project = p.dcp_projectid
+            AND disp.dcp_visibility IN ('General Public', 'LUP')
+            AND disp.statuscode <> 'Deactivated'
         ) AS dispositions
       FROM dcp_project sub_project
       WHERE dcp_name = p.dcp_name
