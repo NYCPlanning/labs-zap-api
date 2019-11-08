@@ -88,6 +88,7 @@ SELECT
         'dcp_publichearinglocation', disp.dcp_publichearinglocation,
         'dcp_dateofpublichearing', disp.dcp_dateofpublichearing,
         'dcp_ispublichearingrequired', disp.dcp_ispublichearingrequired,
+        'dcp_recommendationsubmittedbyname', disp.dcp_recommendationsubmittedbyname,
         'dcp_boroughpresidentrecommendation', disp.dcp_boroughpresidentrecommendation,
         'dcp_boroughboardrecommendation', disp.dcp_boroughboardrecommendation,
         'dcp_communityboardrecommendation', disp.dcp_communityboardrecommendation,
