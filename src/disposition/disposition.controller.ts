@@ -18,7 +18,6 @@ import { OdataService } from '../odata/odata.service';
 const ATTRS_WHITELIST = [
   'dcp_publichearinglocation',
   'dcp_dateofpublichearing',
-  'dcp_ispublichearingrequired',
   'dcp_representing',
   'dcp_nameofpersoncompletingthisform',
   'dcp_title',
