@@ -23,20 +23,6 @@ describe('AppController (e2e)', () => {
       .expect(200);
   });
 
-  describe('Logging in', () => {
-    it('runs /login without token and gives an error', () => {
-      return request(app.getHttpServer())
-        .get('/login')
-        .expect(401);
-    });
-
-    it('runs /login with accessToken and provides a new token', () => {
-      return doLogin(app.getHttpServer(), request)
-        .expect(200)
-        .expect({ message: 'Login successful!' });
-    });
-  });
-
   describe('Users resource', () => {
     it('/users is authenticated', async () => {
       return request(app.getHttpServer())

@@ -1,7 +1,8 @@
 import { Controller } from '@nestjs/common';
-import { Get, Query, Res, Session, Next } from '@nestjs/common';
+import { Get, Query, Res, Session, Next, HttpException } from '@nestjs/common';
 import { Response } from 'express';
 import { Serializer } from 'jsonapi-serializer';
+
 import { AuthService } from './auth/auth.service';
 import { ContactService } from './contact/contact.service';
 
@@ -18,14 +19,20 @@ export class AppController {
   }
 
   @Get('/login')
-  async login(@Res() res: Response, @Query('accessToken') token: string) {
+  async login(@Res() res: Response, @Query('accessToken') NYCIDToken: string) {
     try {
-      const ZAPToken = await this.authService.handleLogin(token);
+      const ZAPToken = await this.authService.generateNewToken(NYCIDToken);
 
       res.cookie('token', ZAPToken, { httpOnly: true })
         .send({ message: 'Login successful!' });
     } catch (e) {
-      res.status(401).send({ errors: e });
+      if (e instanceof HttpException) {
+        res.status(401).send({ errors: [e] });
+      } else {
+        console.log(e);
+
+        res.status(500).send({ errors: [e] });
+      }
     }
   }
 
