@@ -1,4 +1,4 @@
-import { 
+import {
   HttpException,
   HttpStatus,
   Injectable,
@@ -15,14 +15,19 @@ export class AuthService {
   ) {}
 
   async handleLogin(token): Promise<string> {
-    if (!token) {
-      throw new Error(`No token provided`);
-    }
-
     const secret = this.config.get('CRM_SIGNING_SECRET');
 
     // Development option to force return of a specific CRM ID
     const CRM_IMPOSTER_ID = this.config.get('CRM_IMPOSTER_ID');
+    const SKIP_AUTH = this.config.get('SKIP_AUTH');
+
+    if (SKIP_AUTH) return jwt.sign({
+      contactid: CRM_IMPOSTER_ID,
+    }, secret);
+
+    if (!token) {
+      throw new Error(`No token provided`);
+    }
 
     const { mail, exp } = this.validateNYCIDToken(token);
     let { contactid } = await this.contactService.findOne(CRM_IMPOSTER_ID || { emailaddress1: mail });
