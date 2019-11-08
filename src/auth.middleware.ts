@@ -16,10 +16,10 @@ export class AuthMiddleware implements NestMiddleware {
     const { token } = req.cookies;
 
     try {
-      req.session = await this.authService.validateCRMToken(token);
+      req.session = await this.authService.validateCurrentToken(token);
+
       next();
     } catch (e) {
-      console.log(e);
       proceedNoAuth(res, next);
     }
   }
