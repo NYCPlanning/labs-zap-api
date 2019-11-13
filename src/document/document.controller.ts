@@ -39,12 +39,8 @@ export class DocumentController {
       MSCRMCallerID: this.config.get('CRM_ADMIN_SERVICE_USER')
     };
 
-    // decode from 7bit
-    const decodedFile = decodeURI(file.buffer);
-    // normalize line ending in string to CRLF (WINDOWS, DOS)
-    const decodedFileCRLF = eol.crlf(decodedFile);
     // encode base64
-    const encodedBase64File = Buffer.from(decodedFileCRLF).toString('base64');
+    const encodedBase64File = Buffer.from(file.buffer).toString('base64');
 
     let uploadDocResponse = {};
 
