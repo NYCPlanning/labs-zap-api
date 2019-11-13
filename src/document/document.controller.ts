@@ -20,8 +20,9 @@ export class DocumentController {
   /** Uploads a single document
     * The incoming POST request should have form-data with...
     * two body fields:
-    *   entityName - name of a CRM entity. Currently only accepts  `dcp_project` or `dcp_communityboarddisposition`.
-    *   instanceName - should be the `dcp_name` of an instance of the entity identified by `entityName`
+    *   entityName - name of a CRM entity. Currently only accepts  `dcp_communityboarddisposition`.
+    *   instanceId - (required) a 32 character id for an instance of type `entityName`.
+    *                Format should be xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
     * and a `file` field assigned a buffer of data representing a single file.
   */
   @Post('/')
@@ -29,7 +30,7 @@ export class DocumentController {
   async index(@UploadedFile() file, @Req() request: Request, @Res() response) {
     const {
       body: {
-        instanceName,
+        instanceId,
         entityName
       },
     } = request;
@@ -47,19 +48,11 @@ export class DocumentController {
 
     let uploadDocResponse = {};
 
-    if ( entityName === 'dcp_project' ) {
-      const [projectRecord] = (await CRMWebAPI.get(`dcp_projects?$select=dcp_projectname,dcp_projectid,dcp_name&$filter=dcp_name eq '${instanceName}'&$top=1`))['value'];
+    if ( entityName === 'dcp_communityboarddisposition' ) {
+      const dispositionGUID = instanceId;
 
-      const projectGUID = projectRecord.dcp_projectid;
-      const projectID = projectRecord.dcp_name;
-      const folderName = `${projectID}_${projectGUID.replace(/\-/g,'').toUpperCase()}`;
+      const dispositionRecord = (await CRMWebAPI.get(`dcp_communityboarddispositions?$select=dcp_name&$filter=dcp_communityboarddispositionid eq '${dispositionGUID}'&$top=1`))['value'][0];
 
-      uploadDocResponse = await CRMWebAPI.uploadDocument('dcp_project', projectGUID, folderName, file.originalname, encodedBase64File, true, headers);
-      response.status(200).send({"message": uploadDocResponse});
-    } else if ( entityName === 'dcp_communityboarddisposition' ) {
-      const dispositionRecord = (await CRMWebAPI.get(`dcp_communityboarddispositions?$select=dcp_communityboarddispositionid,dcp_name&$filter=dcp_name eq '${instanceName}'&$top=1`))['value'][0];
-
-      const dispositionGUID = dispositionRecord.dcp_communityboarddispositionid;
       const dispositionID = dispositionRecord.dcp_name;
       // Note that some disposition names have multiple trailing whitespace characters.
       // We leave them in because CRM SHOULD* adhere to the convention of dcp_name + dcp_communityboarddispositionid
@@ -69,7 +62,7 @@ export class DocumentController {
       uploadDocResponse = await CRMWebAPI.uploadDocument('dcp_communityboarddisposition', dispositionGUID, folderName, file.originalname, encodedBase64File, true, headers);
       response.status(200).send({"message": uploadDocResponse});
     } else {
-      response.status(400).send({ "error": 'You can only upload files to dcp_project and dcp_communityboarddisposition' });
+      response.status(400).send({ "error": 'You can only upload files to dcp_communityboarddisposition at this time' });
     }
   }
 }

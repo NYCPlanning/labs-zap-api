@@ -91,31 +91,10 @@ describe('Document Upload', () => {
   //   fs.writeFileSync(`${rootPath}/test/mocks.json`, JSON.stringify(nockCalls), 'utf8');
   // });
 
-  // If this fails, it may be due to the project entity setup being changed in UAT2.
-  // For example, if the project entity 2020K0121 is deleted, since this test uploads to that 
-  // project entity. This test overwrites the file test.txt
-  test('User can upload a single document to a Project 2020K0121', async () => {
-    const server = app.getHttpServer();
-    const token = extractJWT(await doLogin(server, request));
-
-    // mock a file that says "buffer"
-    const file = Buffer.from([0x62, 0x75, 0x66, 0x66, 0x65, 0x72]);
-
-    return request(server)
-      .post('/document')
-      .type('form')
-      .attach('file', file, 'test.txt')
-      .field('instanceName', '2020K0121')
-      .field('entityName', 'dcp_project')
-      .set('Cookie', token)
-      .expect(200)
-      .expect({ message: 'Uploaded document successfully.' });
-  });
-
   // If this fails, it may be due to the disposition entity setup being changed in UAT2.
-  // For example, if the disposition entity '2020K0121 - ZC - BK CB3  ' is deleted, since this test uploads to that 
-  // project entity. This test overwrites the file test.txt
-  test('User can upload a single document to a Disposition `2020K0121 - ZC - BK CB3  `', async () => {
+  // For example, if the disposition entity '37b7894b-9ef9-e911-a9bc-001dd8308ef1' is deleted, since this test uploads to that 
+  // disposition entity. This test overwrites the file test.txt
+  test('User can upload a single document to a Disposition `37b7894b-9ef9-e911-a9bc-001dd8308ef1`', async () => {
     const server = app.getHttpServer();
     const token = extractJWT(await doLogin(server, request));
 
@@ -126,10 +105,11 @@ describe('Document Upload', () => {
       .post('/document')
       .type('form')
       .attach('file', file, 'test.txt')
-      .field('instanceName', '2020K0121 - ZC - BK CB3  ') // trailing spaces required
+      .field('instanceId', '37b7894b-9ef9-e911-a9bc-001dd8308ef1') // trailing spaces required
       .field('entityName', 'dcp_communityboarddisposition')
       .set('Cookie', token)
       .expect(200)
       .expect({ message: 'Uploaded document successfully.' });
     });
+
 });
