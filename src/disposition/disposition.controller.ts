@@ -62,13 +62,11 @@ export class DispositionController {
     // then, update the database
     try {
       await this.dynamicsWebApi.update('dcp_communityboarddispositions', id, whitelistedAttrs);
-
-      if (!this.config.get('SKIP_PG')) {
-        await this.dispositionRepository.update(id, whitelistedAttrs);
-      }
+      await this.dispositionRepository.update(id, whitelistedAttrs);
     } catch (e) {
-      const message = await e;
-        console.log(message);
+      const message = await e; 
+      console.log(message);
+
       throw new HttpException({
         errors: [message],
       }, 400);
