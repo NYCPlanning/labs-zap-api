@@ -9,7 +9,9 @@ export class ConfigService {
       this.envConfig = process.env;
     } else {
       try {
-        this.envConfig = dotenv.parse(fs.readFileSync(filePath)) || {};
+        const envFile = dotenv.parse(fs.readFileSync(filePath)) || {};
+
+        this.envConfig = { ...process.env, ...envFile };
       } catch (e) {
         // fallback to whatever the environment is
         this.envConfig = process.env;
