@@ -39,6 +39,7 @@ export class AppController {
   @Get('/users')
   async getUser(@Session() session, @Res() res) {
     const { contactid } = session;
+
     const contact = await this.contactService.findOne(contactid);
 
     if (!contactid) {

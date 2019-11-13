@@ -68,7 +68,9 @@ export class AuthService {
     if (this.SKIP_AUTH) {
       console.log('Warning! SKIP_AUTH is set to true. Your app is unsecured!');
 
-      return this.signNewToken(CRM_IMPOSTER_ID);
+      const newToken = this.signNewToken(CRM_IMPOSTER_ID);
+
+      return this.verifyCRMToken(newToken);
     }
 
     return this.verifyCRMToken(token);
