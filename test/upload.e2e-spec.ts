@@ -112,4 +112,48 @@ describe('Document Upload', () => {
       .expect({ message: 'Uploaded document successfully.' });
     });
 
+  test('User can upload a single pdf to a Disposition `2020K0121 - ZC - BK CB3  `', async () => {
+    const server = app.getHttpServer();
+    const token = extractJWT(await doLogin(server, request));
+
+    return request(server)
+      .post('/document')
+      .type('form')
+      .attach('file', './test/dummy_files/dummy.pdf')
+      .field('instanceId', '37b7894b-9ef9-e911-a9bc-001dd8308ef1') // trailing spaces required
+      .field('entityName', 'dcp_communityboarddisposition')
+      .set('Cookie', token)
+      .expect(200)
+      .expect({ message: 'Uploaded document successfully.' });
+    });
+
+  test('User can upload a single Excel doc to a Disposition `2020K0121 - ZC - BK CB3  `', async () => {
+    const server = app.getHttpServer();
+    const token = extractJWT(await doLogin(server, request));
+
+    return request(server)
+      .post('/document')
+      .type('form')
+      .attach('file', './test/dummy_files/dummy.xlsx')
+      .field('instanceId', '37b7894b-9ef9-e911-a9bc-001dd8308ef1') // trailing spaces required
+      .field('entityName', 'dcp_communityboarddisposition')
+      .set('Cookie', token)
+      .expect(200)
+      .expect({ message: 'Uploaded document successfully.' });
+    });
+
+  test('User can upload a single Word doc to a Disposition `2020K0121 - ZC - BK CB3  `', async () => {
+    const server = app.getHttpServer();
+    const token = extractJWT(await doLogin(server, request));
+
+    return request(server)
+      .post('/document')
+      .type('form')
+      .attach('file', './test/dummy_files/dummy.doc')
+      .field('instanceId', '37b7894b-9ef9-e911-a9bc-001dd8308ef1') // trailing spaces required
+      .field('entityName', 'dcp_communityboarddisposition')
+      .set('Cookie', token)
+      .expect(200)
+      .expect({ message: 'Uploaded document successfully.' });
+    });
 });
