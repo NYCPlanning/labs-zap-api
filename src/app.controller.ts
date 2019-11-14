@@ -53,12 +53,12 @@ export class AppController {
 
   // Serializes an array of objects into a JSON:API document
   serialize(records, opts?: object): Serializer {
-    const ProjectSerializer = new Serializer('users', {
+    const UserSerializer = new Serializer('users', {
       attributes: ['contactid', 'emailaddress1'],
       id: 'contactid',
       meta: { ...opts },
     });
 
-    return ProjectSerializer.serialize(records);
+    return UserSerializer.serialize(records);
   }
 }

@@ -1,5 +1,81 @@
 import { Entity, Column, PrimaryColumn } from 'typeorm';
 
+export const KEYS = [
+  'applicantteam',
+  'applicants',
+  'dcp_name',
+  'dcp_applicanttype',
+  'dcp_borough',
+  'dcp_ceqrnumber',
+  'dcp_ceqrtype',
+  'dcp_certifiedreferred',
+  'dcp_femafloodzonea',
+  'dcp_femafloodzonecoastala',
+  'dcp_femafloodzoneshadedx',
+  'dcp_femafloodzonev',
+  'dcp_sisubdivision',
+  'dcp_sischoolseat',
+  'dcp_projectbrief',
+  'dcp_projectname',
+  'dcp_publicstatus',
+  'dcp_publicstatus_simp',
+  'dcp_projectcompleted',
+  'dcp_hiddenprojectmetrictarget',
+  'dcp_ulurp_nonulurp',
+  'dcp_communitydistrict',
+  'dcp_communitydistricts',
+  'dcp_validatedcommunitydistricts',
+  'has_centroid',
+  'dcp_bsanumber',
+  'dcp_wrpnumber',
+  'dcp_lpcnumber',
+  'dcp_name',
+  'dcp_nydospermitnumber',
+  'bbls',
+  'bbl_featurecollection',
+  'addresses',
+  'keywords',
+  'ulurpnumbers',
+  'center',
+  'lastmilestonedate',
+  'video_links',
+
+  // relationships
+  'actions',
+  'milestones',
+  'dispositions',
+];
+
+export const ACTION_KEYS = [
+  'dcp_action',
+  'dcp_name',
+  'actioncode',
+  'statuscode',
+  'statecode',
+  'dcp_ulurpnumber',
+  'dcp_zoningresolution',
+  'dcp_ccresolutionnumber',
+];
+
+export const MILESTONE_KEYS = [
+  'dcp_milestone',
+  'dcp_name',
+  'milestonename',
+  'dcp_plannedstartdate',
+  'dcp_plannedcompletiondate',
+  'dcp_actualstartdate',
+  'dcp_actualenddate',
+  'statuscode',
+  'dcp_milestonesequence',
+  'display_description',
+  'display_name',
+  'display_date',
+  'display_date2',
+  'dcp_milestoneoutcome',
+  'milestone_links',
+  'is_revised',
+];
+
 @Entity('dcp_project')
 export class Project {
   @PrimaryColumn({ name: 'dcp_projectid' })
