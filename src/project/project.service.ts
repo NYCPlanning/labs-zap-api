@@ -13,7 +13,8 @@ import { ConfigService } from '../config/config.service';
 import { TilesService } from './tiles/tiles.service';
 import { getQueryFile } from '../_utils/get-query-file';
 import { buildProjectsSQL } from './_utils/build-projects-sql';
-import { Project } from './project.entity';
+import { Project, KEYS as PROJECT_KEYS, ACTION_KEYS, MILESTONE_KEYS } from './project.entity';
+import { KEYS as DISPOSITION_KEYS } from '../disposition/disposition.entity';
 
 const findProjectQuery = getQueryFile('/projects/show.sql');
 const boundingBoxQuery = getQueryFile('helpers/bounding-box-query.sql');
@@ -147,37 +148,29 @@ export class ProjectService {
 
   // Serializes an array of objects into a JSON:API document
   serialize(records, opts?: object): Serializer {
-    let [project] = (records.length ? records : [records]);
-    const [action = {}] = project.actions || [];
-    const [milestone = {}] = project.milestones || [];
-    const [disposition = {}] = project.dispositions || [];
-
-    // This is wrong... the wrong approach.
     const ProjectSerializer = new Serializer('projects', {
       id: 'dcp_name',
-      attributes: Object.keys(project),
-      ...(action ? {
-        actions: {
-          ref(project, action) {
-            return `${project.dcp_name}-${action.actioncode}`;
-          },
-          attributes: Object.keys(action),
+      attributes: PROJECT_KEYS,
+      actions: {
+        ref(project, action) {
+          console.log(project);
+          return `${project.dcp_name}-${action.actioncode}`;
         },
-      } : {}),
-      ...(milestone ? {
-        milestones: {
-          ref(project, milestone) {
-            return `${project.dcp_name}-${milestone.dcp_milestone}`;
-          },
-          attributes: Object.keys(milestone),
+        attributes: ACTION_KEYS,
+      },
+
+      milestones: {
+        ref(project, milestone) {
+          return `${project.dcp_name}-${milestone.dcp_milestone}`;
         },
-      } : {}),
-      ...(disposition ? {
-        dispositions: {
-          ref: 'id',
-          attributes: Object.keys(disposition),
-        },
-      } : {}),
+        attributes: MILESTONE_KEYS,
+      },
+
+      dispositions: {
+        ref: 'id',
+        attributes: DISPOSITION_KEYS,
+      },
+
       meta: { ...opts },
     });
 
