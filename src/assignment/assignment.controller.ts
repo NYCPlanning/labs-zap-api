@@ -39,7 +39,6 @@ export class AssignmentController {
 
     // This is wrong... the wrong approach.
     const AssignmentSerializer = new Serializer('assignments', {
-      id: 'dcp_name',
       attributes: Object.keys(assignment),
       project: {
         ref: 'dcp_name',
@@ -63,8 +62,8 @@ export class AssignmentController {
       },
       ...(milestone ? {
         milestones: {
-          ref(project, milestone) {
-            return `${project.dcp_name}-${milestone.dcp_milestone}`;
+          ref(assignment, milestone) {
+            return `${assignment.project.dcp_name}-${milestone.dcp_milestone}`;
           },
           attributes: Object.keys(milestone),
         },

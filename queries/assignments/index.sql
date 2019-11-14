@@ -116,7 +116,8 @@ lups_project_assignments_filtered AS (
   SELECT
     dcp_lupteammemberrole,
     dcp_project AS project_id,
-    tab
+    tab,
+    assignmentid AS id
   FROM lups_project_assignments_with_tab
   WHERE
     dcp_lupteammemberrole <> 'BB'
