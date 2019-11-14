@@ -379,5 +379,5 @@ SELECT
       disp.dcp_project = p.dcp_projectid
   ) AS dispositions
 FROM dcp_project p
-WHERE dcp_name = '${id:value}'
+WHERE dcp_name = ${id}
   AND dcp_visibility = 'General Public'
