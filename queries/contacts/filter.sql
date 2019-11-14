@@ -1,4 +1,4 @@
 SELECT *
 FROM contact
-WHERE emailaddress1 = '${email:value}'
+WHERE emailaddress1 = ${email}
 AND statecode = 'Active'
