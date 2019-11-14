@@ -8,7 +8,7 @@ WITH lups_project_assignments_all AS (
   FROM
     dcp_projectlupteam
   WHERE
-    dcp_lupteammember = '${id:value}' -- plugs in contactid
+    dcp_lupteammember = ${id} -- plugs in contactid
     AND statuscode = 'Active' -- only want lup project assignments that haven't been deactivated
 ),
 
@@ -56,7 +56,7 @@ lups_dispositions_status AS (
     dcp_communityboarddisposition.statuscode <> 'Deactivated'
     AND dcp_communityboarddisposition.dcp_visibility IN ('General Public', 'LUP')
     AND dcp_communityboarddisposition.dcp_project = lups_project_assignments_all.dcp_project
-    AND dcp_communityboarddisposition.dcp_recommendationsubmittedby = '${id:value}' -- plugs in contactid
+    AND dcp_communityboarddisposition.dcp_recommendationsubmittedby = ${id} -- plugs in contactid
     AND (
       (dcp_communityboarddisposition.dcp_representing = 'Borough President' AND lups_project_assignments_all.dcp_lupteammemberrole = 'BP')
       OR (dcp_communityboarddisposition.dcp_representing = 'Borough Board' AND lups_project_assignments_all.dcp_lupteammemberrole = 'BB')
@@ -194,7 +194,7 @@ SELECT
     LEFT JOIN dcp_projectaction AS pact ON disp.dcp_projectaction = pact.dcp_action
     WHERE
       disp.dcp_project = p.dcp_projectid
-      AND disp.dcp_recommendationsubmittedby = '${id:value}' -- plugs in contactid
+      AND disp.dcp_recommendationsubmittedby = ${id} -- plugs in contactid
       AND disp.dcp_visibility IN ('General Public', 'LUP')
       AND disp.statuscode <> 'Deactivated'
   ) AS dispositions,
@@ -754,4 +754,4 @@ SELECT
 FROM lups_project_assignments_filtered AS lup
 LEFT JOIN
   dcp_project AS p ON p.dcp_projectid = lup.project_id
-WHERE tab = '${status:value}'
+WHERE tab = ${status}
