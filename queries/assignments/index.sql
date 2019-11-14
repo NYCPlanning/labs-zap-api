@@ -1,14 +1,15 @@
 -- first, get the list of assigned projects, roles, and statuses for the specific LUP contact
 WITH lups_project_assignments_all AS (
   SELECT DISTINCT
-    CONCAT(dcp_lupteammemberrole,'-',dcp_project) AS assignmentid,
+    dcp_projectlupteamid, -- important! this is the unique ID used for assignments
+    CONCAT(dcp_lupteammemberrole,'-',dcp_project) AS assignment_check, -- this is purely for joining tables and making sure the correct role matches were found
     dcp_project,
     dcp_lupteammemberrole
   FROM
     dcp_projectlupteam
   WHERE
     dcp_lupteammember = '${id:value}' -- plugs in contactid
-    AND statuscode = 'Active'
+    AND statuscode = 'Active' -- only want lup project assignments that haven't been deactivated
 ),
 
 -- get the public status of the LUP's assigned projects
@@ -34,7 +35,7 @@ lups_review_milestones AS (
   WHERE
     dcp_projectmilestone.statuscode <> 'Overridden'
     AND dcp_projectmilestone.dcp_project = lups_project_assignments_all.dcp_project
-    AND (
+    AND ( -- this filters down to only keep the milestones that match our user's role
       (dcp_projectmilestone.dcp_milestone = '923beec4-dad0-e711-8116-1458d04e2fb8' AND lups_project_assignments_all.dcp_lupteammemberrole = 'CB')
       OR (dcp_projectmilestone.dcp_milestone = '943beec4-dad0-e711-8116-1458d04e2fb8' AND lups_project_assignments_all.dcp_lupteammemberrole = 'BP')
       OR (dcp_projectmilestone.dcp_milestone = '963beec4-dad0-e711-8116-1458d04e2fb8' AND lups_project_assignments_all.dcp_lupteammemberrole = 'BB')
@@ -46,8 +47,8 @@ lups_dispositions_status AS (
   SELECT
     lups_project_assignments_all.*,
     dcp_communityboarddisposition.dcp_visibility AS dcp_visibility,
-    dcp_communityboarddisposition.statecode AS statecode,
-    dcp_communityboarddisposition.statuscode AS statuscode
+    dcp_communityboarddisposition.statecode AS statecode, -- inactive or active
+    dcp_communityboarddisposition.statuscode AS statuscode -- more descriptive status of draft, saved, submitted, deactivated
   FROM
     lups_project_assignments_all,
     dcp_communityboarddisposition
@@ -67,7 +68,8 @@ lups_dispositions_status AS (
     dcp_communityboarddisposition.statuscode,
     lups_project_assignments_all.dcp_project,
     lups_project_assignments_all.dcp_lupteammemberrole,
-    lups_project_assignments_all.assignmentid
+    lups_project_assignments_all.dcp_projectlupteamid,
+    lups_project_assignments_all.assignment_check
 ),
 
 -- join all the tables onto the lups_project_assignments and determine which "tab" each assignment belongs on
@@ -79,19 +81,19 @@ lups_project_assignments_with_tab AS (
         THEN 'archive'
       WHEN
         lups_review_milestones.statuscode = 'Not Started'
-        OR projects_public_statuses.dcp_publicstatus = 'Filed'
+        OR projects_public_statuses.dcp_publicstatus = 'Filed' -- included bc sometimes the milestone status isn't filled in
         THEN 'upcoming'
       WHEN
         lups_review_milestones.statuscode IN ('In Progress', 'Completed')
         AND projects_public_statuses.dcp_publicstatus NOT IN ('Approved', 'Withdrawn/Terminated/Disapproved', 'Disapproved')
         AND lups_dispositions_status.statecode = 'Active'
-        AND lups_dispositions_status.statuscode IN ('Draft', 'Saved')
+        AND lups_dispositions_status.statuscode IN ('Draft', 'Saved') -- draft status before LUP makes any edits, saved status after they've submitted hearing
         THEN 'to-review'
       WHEN
         lups_review_milestones.statuscode IN ('In Progress', 'Completed')
         AND projects_public_statuses.dcp_publicstatus NOT IN ('Approved', 'Withdrawn/Terminated/Disapproved', 'Disapproved')
         AND lups_dispositions_status.statecode = 'Inactive'
-        AND lups_dispositions_status.statuscode IN ('Submitted', 'Not Submitted')
+        AND lups_dispositions_status.statuscode IN ('Submitted', 'Not Submitted') -- status becomes submitted once they submit recommendation
         THEN 'reviewed'
     END AS tab,
     lups_project_assignments_all.*,
@@ -106,20 +108,21 @@ lups_project_assignments_with_tab AS (
   INNER JOIN -- inner because we only want projects that are visible to public
     projects_public_statuses ON lups_project_assignments_all.dcp_project = projects_public_statuses.dcp_projectid
   LEFT JOIN
-    lups_dispositions_status ON lups_project_assignments_all.assignmentid = lups_dispositions_status.assignmentid
+    lups_dispositions_status ON lups_project_assignments_all.assignment_check = lups_dispositions_status.assignment_check
   LEFT JOIN
-    lups_review_milestones ON lups_project_assignments_all.assignmentid = lups_review_milestones.assignmentid
+    lups_review_milestones ON lups_project_assignments_all.assignment_check = lups_review_milestones.assignment_check
 ),
 
 -- filter the previous table; we only want to see the BB assignment card for to-review projects and post-cert projects in upcoming
 lups_project_assignments_filtered AS (
   SELECT
+    dcp_projectlupteamid AS id,
     dcp_lupteammemberrole,
     dcp_project AS project_id,
     tab
   FROM lups_project_assignments_with_tab
   WHERE
-    dcp_lupteammemberrole <> 'BB'
+    dcp_lupteammemberrole <> 'BB' -- this drops all BB records except for the two conditions below
     OR (dcp_lupteammemberrole = 'BB' AND tab = 'upcoming' AND dcp_publicstatus = 'Certified/Referred')
     OR (dcp_lupteammemberrole = 'BB' AND tab = 'to-review')
 )
