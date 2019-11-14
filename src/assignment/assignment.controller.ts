@@ -3,6 +3,11 @@ import { Controller, Get, Query, Session } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 import { Serializer } from 'jsonapi-serializer';
 import { getQueryFile } from '../_utils/get-query-file';
+import { KEYS as ASSIGNMENT_KEYS } from './assignment.entity';
+import { KEYS as DISPOSITION_KEYS } from '../disposition/disposition.entity';
+import { KEYS as PROJECT_KEYS } from '../project/project.entity';
+import { MILESTONE_KEYS } from '../project/project.entity';
+import { ACTION_KEYS } from '../project/project.entity';
 
 const userAssignmentsQuery = getQueryFile('/assignments/index.sql');
 const projectQuery = getQueryFile('/projects/project.sql');
@@ -26,54 +31,53 @@ export class AssignmentController {
         status: tab,
       });
 
-      return this.serialize(await getConnection().query(SQL));
+      const records = await getConnection().query(SQL);
+
+      return this.serialize(records);
     }
   }
 
   // Serializes an array of objects into a JSON:API document
   serialize(records, opts?: object): Serializer {
-    let [assignment] = (records.length ? records : [records]);
-    const [milestone = {}] = assignment.milestones || [];
-    const [disposition = {}] = assignment.dispositions || [];
-    const { project = {} } = assignment || {};
+    const sanitizedRecords = records.map(record => {
+      if (!record.dispositions) record.dispositions = [];
+      if (!record.milestones) record.milestones = [];
+    });
 
     // This is wrong... the wrong approach.
     const AssignmentSerializer = new Serializer('assignments', {
-      attributes: Object.keys(assignment),
+      attributes: ASSIGNMENT_KEYS,
       project: {
         ref: 'dcp_name',
-        attributes: Object.keys(project),
+        attributes: PROJECT_KEYS,
         actions: {
           ref(project, action) {
             return `${project.dcp_name}-${action.actioncode}`;
           },
-          attributes: Object.keys((project.actions || [])[0] || {}),
+          attributes: ACTION_KEYS,
         },
         milestones: {
           ref(project, milestone) {
             return `${project.dcp_name}-${milestone.dcp_milestone}`;
           },
-          attributes: Object.keys((project.milestones || [])[0] || {}),
+          attributes: MILESTONE_KEYS,
         },
         dispositions: {
           ref: 'id',
-          attributes: Object.keys((project.dispositions || [])[0] || {}),
+          attributes: DISPOSITION_KEYS,
         },
       },
-      ...(milestone ? {
-        milestones: {
-          ref(assignment, milestone) {
-            return `${assignment.project.dcp_name}-${milestone.dcp_milestone}`;
-          },
-          attributes: Object.keys(milestone),
+      milestones: {
+        ref(assignment, milestone) {
+          return `${assignment.project.dcp_name}-${milestone.dcp_milestone}`;
         },
-      } : {}),
-      ...(disposition ? {
-        dispositions: {
-          ref: 'id',
-          attributes: Object.keys(disposition),
-        },
-      } : {}),
+        attributes: MILESTONE_KEYS,
+      },
+
+      dispositions: {
+        ref: 'id',
+        attributes: DISPOSITION_KEYS,
+      },
       meta: { ...opts },
     });
 
