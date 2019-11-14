@@ -44,7 +44,6 @@ export class AssignmentController {
       if (!record.milestones) record.milestones = [];
     });
 
-    // This is wrong... the wrong approach.
     const AssignmentSerializer = new Serializer('assignments', {
       attributes: ASSIGNMENT_KEYS,
       project: {
