@@ -35,11 +35,6 @@ export function buildProjectsSQL(req, type = 'filter') {
     block = '',
     distance_from_point = [],
     radius_from_point = 10,
-
-    // user-specific filters
-    // defaults to null because filtering on this
-    // requires authentication
-    project_lup_status = null, // 'to-review'
   } = query;
 
   // special handling for FEMA flood zones

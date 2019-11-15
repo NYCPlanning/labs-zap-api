@@ -70,4 +70,12 @@ describe('Disposition Patch', () => {
       })
       .expect(200)
   });
+
+  test('It requires authentication', async () => {
+    const server = app.getHttpServer();
+
+    return request(server)
+      .patch('/dispositions/472fc5a1-9844-e811-813d-1458d04d0698')
+      .expect(401);
+  });
 });
