@@ -156,4 +156,16 @@ describe('Document Upload', () => {
       .expect(200)
       .expect({ message: 'Uploaded document successfully.' });
     });
+
+  test('It requires authentication', async () => {
+    const server = app.getHttpServer();
+
+    return request(server)
+      .post('/document')
+      .type('form')
+      .attach('file', './test/dummy_files/dummy.doc')
+      .field('instanceId', '37b7894b-9ef9-e911-a9bc-001dd8308ef1') // trailing spaces required
+      .field('entityName', 'dcp_communityboarddisposition')
+      .expect(401);
+  });
 });

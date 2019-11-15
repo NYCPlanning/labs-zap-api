@@ -1,5 +1,5 @@
 import * as pgp from 'pg-promise';
-import { Controller, Get, Query, Session } from '@nestjs/common';
+import { Controller, Get, Query, Session, HttpException, HttpStatus } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 import { Serializer } from 'jsonapi-serializer';
 import { getQueryFile } from '../_utils/get-query-file';
@@ -16,6 +16,8 @@ const projectQuery = getQueryFile('/projects/project.sql');
 export class AssignmentController {
   @Get('/')
   async index(@Query() query, @Session() session) {
+    if (!session) throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+
     const { contactid } = session;
     const { tab = 'to-review' } = query;
 

@@ -4,7 +4,9 @@ import {
   Body,
   Req,
   Param,
+  Session,
   HttpException,
+  HttpStatus
 } from '@nestjs/common';
 import { Deserializer } from 'jsonapi-serializer';
 import { pick } from 'underscore';
@@ -53,7 +55,9 @@ export class DispositionController {
   ) {}
 
   @Patch('/:id')
-  async update(@Body() body, @Param('id') id) {
+  async update(@Body() body, @Param('id') id, @Session() session) {
+    if (!session) throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+
     const attributes = await deserialize(body);
     const whitelistedAttrs = pick(attributes, ATTRS_WHITELIST);
 

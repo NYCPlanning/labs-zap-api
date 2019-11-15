@@ -26,7 +26,7 @@ describe('Assignment Get', () => {
   // NOTE: this test is actually hitting the database. it maybe fail due to a timeout.
   // if this happens rerun the test. in the long-run, get a real test database!
   test('Get correct assignment keys', async () => {
-    const server = app.getHttpServer(); // UAT2 server
+    const server = app.getHttpServer();
     const token = extractJWT(await doLogin(server, request)); // token that is passed with each request
 
     return request(server)
@@ -43,4 +43,12 @@ describe('Assignment Get', () => {
         expect(assignment).toHaveProperty('attributes.tab', 'upcoming')
       });
   }, 30000);
+
+  test('It requires authentication', async () => {
+    const server = app.getHttpServer();
+
+    return request(server)
+      .get('/assignments?include=project.milestones%2Cproject.dispositions%2Cproject.actions&tab=upcoming')
+      .expect(401);
+  });
 });

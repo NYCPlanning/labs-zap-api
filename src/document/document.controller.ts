@@ -4,6 +4,9 @@ import { Controller,
   Res,
   UseInterceptors,
   UploadedFile,
+  HttpStatus,
+  HttpException,
+  Session,
 } from '@nestjs/common';
 import { ConfigService } from '../config/config.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -27,7 +30,9 @@ export class DocumentController {
   */
   @Post('/')
   @UseInterceptors(FileInterceptor('file'))
-  async index(@UploadedFile() file, @Req() request: Request, @Res() response) {
+  async index(@UploadedFile() file, @Req() request: Request, @Res() response, @Session() session) {
+    if (!session) throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+
     const {
       body: {
         instanceId,
