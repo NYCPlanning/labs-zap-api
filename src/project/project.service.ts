@@ -152,17 +152,12 @@ export class ProjectService {
       id: 'dcp_name',
       attributes: PROJECT_KEYS,
       actions: {
-        ref(project, action) {
-          console.log(project);
-          return `${project.dcp_name}-${action.actioncode}`;
-        },
+        ref: 'id',
         attributes: ACTION_KEYS,
       },
 
       milestones: {
-        ref(project, milestone) {
-          return `${project.dcp_name}-${milestone.dcp_milestone}`;
-        },
+        ref: 'id',
         attributes: MILESTONE_KEYS,
       },
 
