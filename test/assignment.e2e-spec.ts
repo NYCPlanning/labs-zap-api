@@ -41,6 +41,12 @@ describe('Assignment Get', () => {
         expect(assignment).toHaveProperty('type', 'assignments')
         expect(assignment).toHaveProperty('attributes.dcp-lupteammemberrole')
         expect(assignment).toHaveProperty('attributes.tab', 'upcoming')
+
+        const relationships = await response.body.data[0].relationships;
+
+        expect(relationships).toHaveProperty('dispositions')
+        expect(relationships).toHaveProperty('milestones')
+        expect(relationships).toHaveProperty('project')
       });
   }, 30000);
 

@@ -4,7 +4,7 @@ export const KEYS = [
   'dcp_publichearinglocation',
   'dcp_ispublichearingrequired',
   'dcp_dateofpublichearing',
-  'dcp_recommendationsubmittedbyname',
+  'dcp_recommendationsubmittedby',
   'dcp_boroughpresidentrecommendation',
   'dcp_boroughboardrecommendation',
   'dcp_communityboardrecommendation',
@@ -37,7 +37,7 @@ export class Disposition {
   dcp_ispublichearingrequired: string;
 
   @Column()
-  dcp_recommendationsubmittedbyname: string;
+  dcp_recommendationsubmittedby: string;
 
   @Column()
   form_completer_name: string;
