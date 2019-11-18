@@ -7,4 +7,7 @@ export class Contact {
 
   @Column()
   emailaddress1: string;
+
+  @Column()
+  fullname: string;
 }

@@ -365,6 +365,7 @@ SELECT
         'dcp_totalmembersappointedtotheboard', disp.dcp_totalmembersappointedtotheboard,
         'dcp_wasaquorumpresent', disp.dcp_wasaquorumpresent,
         'recommendationsubmittedby', disp.dcp_recommendationsubmittedby,
+        'fullname', contact.fullname,
         'representing', disp.dcp_representing,
         'dateofpublichearing', disp.dcp_dateofpublichearing,
         'boroughboardrecommendation', disp.dcp_boroughboardrecommendation,
@@ -375,6 +376,7 @@ SELECT
       )
     )
     FROM dcp_communityboarddisposition AS disp
+    LEFT JOIN contact ON dcp_recommendationsubmittedby = contact.contactid
     WHERE
       disp.dcp_project = p.dcp_projectid
   ) AS dispositions

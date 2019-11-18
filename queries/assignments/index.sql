@@ -155,7 +155,8 @@ SELECT
         'dcp_publichearinglocation', disp.dcp_publichearinglocation,
         'dcp_dateofpublichearing', disp.dcp_dateofpublichearing,
         'dcp_ispublichearingrequired', disp.dcp_ispublichearingrequired,
-        'dcp_recommendationsubmittedbyname', disp.dcp_recommendationsubmittedbyname,
+        'dcp_recommendationsubmittedby', disp.dcp_recommendationsubmittedby,
+        'fullname', contact.fullname,
         'dcp_boroughpresidentrecommendation', disp.dcp_boroughpresidentrecommendation,
         'dcp_boroughboardrecommendation', disp.dcp_boroughboardrecommendation,
         'dcp_communityboardrecommendation', disp.dcp_communityboardrecommendation,
@@ -192,6 +193,7 @@ SELECT
     )
     FROM dcp_communityboarddisposition AS disp
     LEFT JOIN dcp_projectaction AS pact ON disp.dcp_projectaction = pact.dcp_action
+    LEFT JOIN contact ON dcp_recommendationsubmittedby = contact.contactid
     WHERE
       disp.dcp_project = p.dcp_projectid
       AND disp.dcp_recommendationsubmittedby = ${id} -- plugs in contactid
@@ -728,6 +730,7 @@ SELECT
               'dcp_name', pact.dcp_name,
               'dcp_ulurpnumber', pact.dcp_ulurpnumber,
               'recommendationsubmittedby', disp.dcp_recommendationsubmittedby,
+              'fullname', contact.fullname,
               'representing', disp.dcp_representing,
               'dateofpublichearing', disp.dcp_dateofpublichearing,
               'boroughboardrecommendation', disp.dcp_boroughboardrecommendation,
@@ -739,6 +742,7 @@ SELECT
           )
           FROM dcp_communityboarddisposition AS disp
           LEFT JOIN dcp_projectaction AS pact ON disp.dcp_projectaction = pact.dcp_action
+          LEFT JOIN contact ON dcp_recommendationsubmittedby = contact.contactid
           WHERE
             -- note: we want to get all dispositions, but we only want to show the public ones WHERE statuscode IN ('Saved', 'Submitted')
             disp.dcp_project = p.dcp_projectid
