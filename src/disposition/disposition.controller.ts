@@ -38,6 +38,11 @@ const ATTRS_WHITELIST = [
   'dcp_votingabstainingonrecommendation',
   'dcp_consideration',
   'dcp_datereceived',
+
+  // these are computed from the
+  // other values on the model
+  'statuscode',
+  'statecode',
 ];
 const { deserialize } = new Deserializer({
   keyForAttribute: 'underscore_case',
