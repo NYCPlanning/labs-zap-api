@@ -1,6 +1,6 @@
 import * as pgp from 'pg-promise';
 import { generateDynamicQuery } from './generate-dynamic-sql';
-import { getQueryFile } from '../../_utils/get-query-file';
+import { getQueryFile } from './../_utils/get-query-file';
 
 // import sql query templates
 const listProjectsQuery = getQueryFile('/projects/index.sql');

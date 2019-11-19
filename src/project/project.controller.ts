@@ -40,6 +40,8 @@ export class ProjectController {
   // Extract the raw Express instance and pass to the query method
   @Get('/')
   async index(@Req() request: Request) {
+
+
     return await this.projectService.queryProjects(request);
   }
 
