@@ -39,8 +39,15 @@ export class ProjectController {
 
   // Extract the raw Express instance and pass to the query method
   @Get('/')
-  async index(@Req() request: Request) {
-    return await this.projectService.queryProjects(request);
+  async index(@Req() request: Request, @Res() response) {
+    const downloadProjects = await this.projectService.queryProjectsDownload(request);
+
+    // const { params } = request;
+    // const { filetype } = params;
+
+    response.send(downloadProjects);
+
+    return downloadProjects;
   }
 
   @Get('/:id')

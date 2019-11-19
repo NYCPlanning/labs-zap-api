@@ -61,4 +61,19 @@ describe('Project Get', () => {
         expect(project).toHaveProperty('attributes.ulurpnumbers')
       });
   }, 30000);
+
+  test('Get correct download', async () => {
+    const server = app.getHttpServer(); // UAT2 server
+    const token = extractJWT(await doLogin(server, request)); // token that is passed with each request
+
+    return request(server)
+      .get('/projects.csv?page=1&dcp_publicstatus%5B0%5D=Filed&dcp_publicstatus%5B1%5D=In%20Public%20Review')
+      .set('Cookie', token)
+      .expect(200)
+      .then(async response => {
+        const [project] = await response.body.data;
+
+        // console.log('heya', project);
+      });
+  }, 30000);
 });

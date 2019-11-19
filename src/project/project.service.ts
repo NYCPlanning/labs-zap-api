@@ -13,6 +13,7 @@ import { ConfigService } from '../config/config.service';
 import { TilesService } from './tiles/tiles.service';
 import { getQueryFile } from '../_utils/get-query-file';
 import { buildProjectsSQL } from './_utils/build-projects-sql';
+import { transform } from './_utils/transform-actions';
 import { Project } from './project.entity';
 
 const findProjectQuery = getQueryFile('/projects/show.sql');
@@ -68,6 +69,14 @@ export class ProjectService {
     }
 
     return this.serialize(projects, meta);
+  }
+
+  // TODO: Use the ORM for this instead of buildProjectsSQL
+  async queryProjectsDownload(request: Request) {
+    const downloadProjects = await this.projectRepository.query(buildProjectsSQL(request, 'csv_download'));
+    let meta = extractMeta(downloadProjects);
+
+    return this.serialize(downloadProjects, meta);
   }
 
   async generateTilesForQuery(projects = [], request: Request) {
