@@ -86,14 +86,14 @@ lups_project_assignments_with_tab AS (
       WHEN
         lups_review_milestones.statuscode IN ('In Progress', 'Completed')
         AND projects_public_statuses.dcp_publicstatus NOT IN ('Approved', 'Withdrawn/Terminated/Disapproved', 'Disapproved')
-        AND lups_dispositions_status.statecode = 'Active'
-        AND lups_dispositions_status.statuscode IN ('Draft', 'Saved') -- draft status before LUP makes any edits, saved status after they've submitted hearing
+        AND lups_dispositions_status.statecode IN ('Active', '0')
+        AND lups_dispositions_status.statuscode IN ('Draft', 'Saved', '1', '717170000') -- draft status before LUP makes any edits, saved status after they've submitted hearing
         THEN 'to-review'
       WHEN
         lups_review_milestones.statuscode IN ('In Progress', 'Completed')
         AND projects_public_statuses.dcp_publicstatus NOT IN ('Approved', 'Withdrawn/Terminated/Disapproved', 'Disapproved')
-        AND lups_dispositions_status.statecode = 'Inactive'
-        AND lups_dispositions_status.statuscode IN ('Submitted', 'Not Submitted') -- status becomes submitted once they submit recommendation
+        AND lups_dispositions_status.statecode IN ('Inactive', '1')
+        AND lups_dispositions_status.statuscode IN ('Submitted', 'Not Submitted', '2', '717170002') -- status becomes submitted once they submit recommendation
         THEN 'reviewed'
     END AS tab,
     lups_project_assignments_all.*,
