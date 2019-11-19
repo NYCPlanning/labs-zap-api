@@ -89,7 +89,9 @@ export class AuthService {
       // prefer CRM_IMPOSTER_ID if it exists
       return this.contactService.findOne(CRM_IMPOSTER_ID || { emailaddress1: mail });
     } catch (e) {
-      throw new HttpException(e, HttpStatus.UNAUTHORIZED);
+      throw new HttpException(`
+        CRM user not found. Please make sure your e-mail is associated with an assignment.
+      `, HttpStatus.UNAUTHORIZED);
     }
   }
 
