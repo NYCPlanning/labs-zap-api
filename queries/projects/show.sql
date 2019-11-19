@@ -46,6 +46,7 @@ SELECT
   ) AS bbl_multipolygon,
   (
     SELECT json_agg(json_build_object(
+      'id', a.dcp_projectactionid,
       'dcp_name', SUBSTRING(a.dcp_name FROM '-{1}\s*(.*)'), -- use regex to pull out action name -{1}(.*)
       'actioncode', SUBSTRING(a.dcp_name FROM '^(\w+)'),
       'dcp_ulurpnumber', a.dcp_ulurpnumber,
@@ -137,6 +138,7 @@ SELECT
   ) AS actions,
   (
     SELECT json_agg(json_build_object(
+      'id', m.dcp_projectmilestoneid,
       'dcp_name', m.dcp_name,
       'milestonename', m.milestonename,
       'dcp_plannedstartdate', m.dcp_plannedstartdate,
