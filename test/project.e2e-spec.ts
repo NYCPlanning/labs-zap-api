@@ -38,7 +38,6 @@ describe('Project Get', () => {
 
         expect(project).toHaveProperty('id')
         expect(project).toHaveProperty('type', 'projects')
-        expect(project).toHaveProperty('attributes.actiontypes')
         expect(project).toHaveProperty('attributes.applicants')
         expect(project).toHaveProperty('attributes.center')
         expect(project).toHaveProperty('attributes.dcp-borough')
