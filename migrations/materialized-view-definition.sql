@@ -20,7 +20,7 @@ LEFT JOIN (
   SELECT *
   FROM dcp_projectaction
   WHERE statuscode <> 'Mistake'
-  AND SUBSTRING(dcp_name FROM '^(\\w+)') IN (
+  AND LEFT(dcp_name, 2) IN (
     'BD',
     'BF',
     'CM',
