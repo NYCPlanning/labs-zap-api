@@ -36,28 +36,27 @@ describe('Project Get', () => {
       .then(async response => {
         const [project] = await response.body.data;
 
-        expect(project).toHaveProperty('id')
-        expect(project).toHaveProperty('type', 'projects')
-        expect(project).toHaveProperty('attributes.applicants')
-        expect(project).toHaveProperty('attributes.center')
-        expect(project).toHaveProperty('attributes.dcp-borough')
-        expect(project).toHaveProperty('attributes.dcp-ceqrnumber')
-        expect(project).toHaveProperty('attributes.dcp-ceqrtype')
-        expect(project).toHaveProperty('attributes.dcp-certifiedreferred')
-        expect(project).toHaveProperty('attributes.dcp-communitydistricts')
-        expect(project).toHaveProperty('attributes.dcp-femafloodzonea')
-        expect(project).toHaveProperty('attributes.dcp-femafloodzonecoastala')
-        expect(project).toHaveProperty('attributes.dcp-femafloodzoneshadedx')
-        expect(project).toHaveProperty('attributes.dcp-femafloodzonev')
-        expect(project).toHaveProperty('attributes.dcp-name')
-        expect(project).toHaveProperty('attributes.dcp-projectbrief')
-        expect(project).toHaveProperty('attributes.dcp-projectname')
-        expect(project).toHaveProperty('attributes.dcp-publicstatus-simp')
-        expect(project).toHaveProperty('attributes.dcp-ulurp-nonulurp')
-        expect(project).toHaveProperty('attributes.has-centroid')
-        expect(project).toHaveProperty('attributes.lastmilestonedate')
-        expect(project).toHaveProperty('attributes.total-projects')
-        expect(project).toHaveProperty('attributes.ulurpnumbers')
+        expect(project).toHaveProperty('id');
+        expect(project).toHaveProperty('type', 'projects');
+        expect(project).toHaveProperty('attributes.applicants');
+        expect(project).toHaveProperty('attributes.center');
+        expect(project).toHaveProperty('attributes.dcp-borough');
+        expect(project).toHaveProperty('attributes.dcp-ceqrnumber');
+        expect(project).toHaveProperty('attributes.dcp-ceqrtype');
+        expect(project).toHaveProperty('attributes.dcp-certifiedreferred');
+        expect(project).toHaveProperty('attributes.dcp-communitydistricts');
+        expect(project).toHaveProperty('attributes.dcp-femafloodzonea');
+        expect(project).toHaveProperty('attributes.dcp-femafloodzonecoastala');
+        expect(project).toHaveProperty('attributes.dcp-femafloodzoneshadedx');
+        expect(project).toHaveProperty('attributes.dcp-femafloodzonev');
+        expect(project).toHaveProperty('attributes.dcp-name');
+        expect(project).toHaveProperty('attributes.dcp-projectbrief');
+        expect(project).toHaveProperty('attributes.dcp-projectname');
+        expect(project).toHaveProperty('attributes.dcp-publicstatus-simp');
+        expect(project).toHaveProperty('attributes.dcp-ulurp-nonulurp');
+        expect(project).toHaveProperty('attributes.has-centroid');
+        expect(project).toHaveProperty('attributes.lastmilestonedate');
+        expect(project).toHaveProperty('attributes.ulurpnumbers');
       });
   }, 30000);
 });
