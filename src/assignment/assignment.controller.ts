@@ -18,8 +18,12 @@ export class AssignmentController {
   async index(@Query() query, @Session() session) {
     if (!session) throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
 
-    const { contactid } = session;
-    const { tab = 'to-review' } = query;
+    let { contactid } = session;
+
+    const { tab = 'to-review', contact = '' } = query;
+
+    // godmode: allow override of contactid for assignments lookup
+    if (contact) contactid = contact;
 
     // we have different queries for LUPP things
     if (tab && contactid) {

@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule } from '../config/config.module';
+import { OdataModule } from '../odata/odata.module';
 import { ContactService } from './contact.service';
 import { Contact } from './contact.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -12,6 +13,7 @@ describe('ContactService', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         ConfigModule,
+        OdataModule,
       ],
       providers: [
         ContactService,
