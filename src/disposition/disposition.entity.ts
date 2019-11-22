@@ -21,6 +21,7 @@ export const KEYS = [
   'dcp_votingabstainingonrecommendation',
   'dcp_totalmembersappointedtotheboard',
   'dcp_wasaquorumpresent',
+  'dcp_projectaction'
 ];
 
 @Entity('dcp_communityboarddisposition')
@@ -93,4 +94,7 @@ export class Disposition {
 
   @Column()
   dcp_wasaquorumpresent: string;
+
+  @Column()
+  dcp_projectaction: string;
 }
