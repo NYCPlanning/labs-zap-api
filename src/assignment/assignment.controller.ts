@@ -56,9 +56,7 @@ export class AssignmentController {
         ref: 'dcp_name',
         attributes: PROJECT_KEYS,
         actions: {
-          ref(project, action) {
-            return `${project.dcp_name}-${action.actioncode}`;
-          },
+          ref: 'id',
           attributes: ACTION_KEYS,
         },
         milestones: {
