@@ -3,6 +3,7 @@ import { Response } from 'express';
 import { AuthService } from './auth/auth.service';
 import { ContactService } from './contact/contact.service';
 import { AppController } from './app.controller';
+import { ConfigService } from './config/config.service';
 
 describe('App Controller', () => {
   let controller: AppController;
@@ -19,6 +20,13 @@ describe('App Controller', () => {
           provide: ContactService,
           // how you provide the injection token in a test instance
           useValue: new (class Mock { }),
+        },
+        {
+          provide: ConfigService,
+          // how you provide the injection token in a test instance
+          useValue: new (class Mock {
+            get() {}
+          }),
         },
       ],
       controllers: [AppController],

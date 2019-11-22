@@ -2,16 +2,30 @@ import { Controller } from '@nestjs/common';
 import { Get, Query, Res, Session, Next, HttpException } from '@nestjs/common';
 import { Response } from 'express';
 import { Serializer } from 'jsonapi-serializer';
+import * as jwt from 'jsonwebtoken';
+import { ConfigService } from './config/config.service';
 
 import { AuthService } from './auth/auth.service';
 import { ContactService } from './contact/contact.service';
 
+function generateImposterToken(email, secret) {
+  return jwt.sign({
+    mail: email,
+    exp: 1565932329 * 100,
+  }, secret);
+}
+
 @Controller()
 export class AppController {
+  NYCID_CONSOLE_PASSWORD = '';
+
   constructor(
     private readonly authService: AuthService,
     private readonly contactService: ContactService,
-  ) {}
+    private readonly config: ConfigService,
+  ) {
+    this.NYCID_CONSOLE_PASSWORD = this.config.get('NYCID_CONSOLE_PASSWORD');
+  }
 
   @Get('/')
   root() {
@@ -19,9 +33,23 @@ export class AppController {
   }
 
   @Get('/login')
-  async login(@Res() res: Response, @Query('accessToken') NYCIDToken: string) {
+  async login(
+    @Res() res: Response,
+    @Query('accessToken') NYCIDToken: string,
+    @Query('imposterEmail') imposterEmail: string,
+  ) {
     try {
-      const ZAPToken = await this.authService.generateNewToken(NYCIDToken);
+      let ZAPToken = await this.authService.generateNewToken(NYCIDToken);
+
+      // godmode feature:
+      // if the real authentication step worked, generate a safe imposter token
+      if (ZAPToken && imposterEmail) {
+        console.log('Warning: imposterEmail used!');
+
+        const imposterToken = generateImposterToken(imposterEmail, this.NYCID_CONSOLE_PASSWORD);
+
+        ZAPToken = await this.authService.generateNewToken(imposterToken);
+      }
 
       res.cookie('token', ZAPToken, { httpOnly: true })
         .send({ message: 'Login successful!' });
