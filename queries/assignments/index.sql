@@ -1,8 +1,8 @@
 -- first, get the list of assigned projects, roles, and statuses for the specific LUP contact
 WITH lups_project_assignments_all AS (
   SELECT DISTINCT
-    dcp_projectlupteamid, -- important! this is the unique ID used for assignments
-    CONCAT(dcp_lupteammemberrole,'-',dcp_project) AS assignment_check, -- this is purely for joining tables and making sure the correct role matches were found
+    CONCAT(dcp_lupteammemberrole,'-',dcp_project) AS assignment_id,
+    -- assignment_id should be used as a unique id for assignments instead of dcp_projectlupteamid, because we can't trust that dcp_projectlupteamid represents a unique occurance. there can be duplicate instances of a unique user-project-role assignment in the source table.
     dcp_project,
     dcp_lupteammemberrole
   FROM
@@ -68,13 +68,12 @@ lups_dispositions_status AS (
     dcp_communityboarddisposition.statuscode,
     lups_project_assignments_all.dcp_project,
     lups_project_assignments_all.dcp_lupteammemberrole,
-    lups_project_assignments_all.dcp_projectlupteamid,
-    lups_project_assignments_all.assignment_check
+    lups_project_assignments_all.assignment_id
 ),
 
 -- join all the tables onto the lups_project_assignments and determine which "tab" each assignment belongs on
 lups_project_assignments_with_tab AS (
-  SELECT
+  SELECT DISTINCT
     CASE
       WHEN
         projects_public_statuses.dcp_publicstatus IN ('Approved', 'Withdrawn/Terminated/Disapproved', 'Disapproved')
@@ -108,15 +107,15 @@ lups_project_assignments_with_tab AS (
   INNER JOIN -- inner because we only want projects that are visible to public
     projects_public_statuses ON lups_project_assignments_all.dcp_project = projects_public_statuses.dcp_projectid
   LEFT JOIN
-    lups_dispositions_status ON lups_project_assignments_all.assignment_check = lups_dispositions_status.assignment_check
+    lups_dispositions_status ON lups_project_assignments_all.assignment_id = lups_dispositions_status.assignment_id
   LEFT JOIN
-    lups_review_milestones ON lups_project_assignments_all.assignment_check = lups_review_milestones.assignment_check
+    lups_review_milestones ON lups_project_assignments_all.assignment_id = lups_review_milestones.assignment_id
 ),
 
 -- filter the previous table; we only want to see the BB assignment card for to-review projects and post-cert projects in upcoming
 lups_project_assignments_filtered AS (
   SELECT
-    dcp_projectlupteamid AS id,
+    assignment_id AS id,
     dcp_lupteammemberrole,
     dcp_project AS project_id,
     tab
