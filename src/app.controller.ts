@@ -40,22 +40,14 @@ export class AppController {
   async getUser(@Session() session, @Res() res) {
     const { contactid } = session;
 
+    const contact = await this.contactService.findOne(contactid);
+
     if (!contactid) {
       res.status(401).send({
         errors: ['Authentication required for this route'],
       });
-
-      return;
-    } 
-
-    try {
-      const contact = await this.contactService.findOne(contactid);
-
+    } else {
       res.send(this.serialize(contact));
-    } catch(e) {
-      res.status(401).send({
-        errors: ['CRM user not found. Authentication required for this route'],
-      });
     }
   }
 

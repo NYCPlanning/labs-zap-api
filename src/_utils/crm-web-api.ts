@@ -77,7 +77,7 @@ export const CRMWebAPI = {
     return newObj;
   },
 
-  get: async function (query, maxPageSize = 100, headers= {}): Promise<any> {
+  get: async function (query, maxPageSize = 100, headers= {}) {
     //  get token
     const JWToken = await ADAL.acquireToken();
     const options = {

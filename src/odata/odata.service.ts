@@ -22,19 +22,11 @@ export class OdataService {
     CRMWebAPI.CRMUrl = this.config.get('CRM_HOST');
   }
 
-  update(entityName, guid, data, headers = {}) {
-    return CRMWebAPI.update(entityName, guid, data, headers);
-  }
+  update(model, guid, data, headers = {}) {
+    if (!this.config.get('SKIP_CRM')) {
+      return CRMWebAPI.update(model, guid, data, headers);
+    }
 
-  async get(entityName, guid): Promise<[]> {
-    const { value } = await CRMWebAPI.get(`${entityName}(${guid})`);
-
-    return value;
-  }
-
-  async filter(entityName, operators): Promise<[]> {
-    const { value } = await CRMWebAPI.get(`${entityName}?$filter=${operators}`);
-
-    return value;
+    return data;
   }
 }
