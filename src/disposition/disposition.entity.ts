@@ -12,6 +12,7 @@ export const KEYS = [
   'dcp_votelocation',
   'dcp_datereceived',
   'dcp_dateofvote',
+  'dcp_nameofpersoncompletingthisform',
   'statecode',
   'statuscode',
   'dcp_docketdescription',
@@ -26,6 +27,9 @@ export const KEYS = [
 export class Disposition {
   @PrimaryColumn({ name: 'dcp_communityboarddispositionid' })
   id: string;
+
+  @Column()
+  dcp_nameofpersoncompletingthisform: string
 
   @Column()
   dcp_publichearinglocation: string;
