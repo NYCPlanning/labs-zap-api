@@ -20,10 +20,7 @@ export class AssignmentController {
 
     let { contactid } = session;
 
-    const { tab = 'to-review', contact = '' } = query;
-
-    // godmode: allow override of contactid for assignments lookup
-    if (contact) contactid = contact;
+    const { tab = 'to-review' } = query;
 
     // we have different queries for LUPP things
     if (tab && contactid) {
