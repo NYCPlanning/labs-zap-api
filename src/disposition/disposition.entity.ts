@@ -13,6 +13,7 @@ export const KEYS = [
   'dcp_datereceived',
   'dcp_dateofvote',
   'dcp_nameofpersoncompletingthisform',
+  'fullname',
   'statecode',
   'statuscode',
   'dcp_docketdescription',
