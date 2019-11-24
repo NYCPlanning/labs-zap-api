@@ -4,7 +4,7 @@ export const doLogin = (appServer, request) => {
   // the signing secret arg here is copied from the test.env file
   // this should be dealt with in a different way...
   const mockJWT = jwt.sign({
-    mail: 'rsinger@planning.nyc.gov',
+    mail: 'labs_dl@planning.nyc.gov',
     exp: 1565932329 * 100,
   }, 'test');
 
