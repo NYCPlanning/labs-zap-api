@@ -324,20 +324,61 @@ SELECT
   (
     SELECT json_agg(
       json_build_object(
-        'role', pa.dcp_applicantrole,
-        'name', CASE WHEN pa.dcp_name IS NOT NULL THEN pa.dcp_name ELSE account.name END
+        'role', pa.role,
+        'name', pa.name
       )
     )
     FROM (
-      SELECT *
-      FROM dcp_projectapplicant
-      WHERE dcp_project = p.dcp_projectid
-        AND dcp_applicantrole IN ('Applicant', 'Co-Applicant', 'Primary Applicant')
-        AND statuscode = 'Active'
-      ORDER BY dcp_applicantrole ASC
+      ( -- query for primary contact from project
+        SELECT
+        dcp_applicantadministrator_customer AS id,
+        dcp_applicantadministrator_customer$type AS type,
+        CASE
+          WHEN dcp_applicantadministrator_customer$type = 'contact' THEN contact.fullname
+          WHEN dcp_applicantadministrator_customer$type = 'account' THEN account.name
+        END AS name,
+        'Primary Contact' AS role,
+        'Project Record' AS source
+        from dcp_project
+        LEFT JOIN contact ON contact.contactid = p.dcp_applicantadministrator_customer
+        LEFT JOIN account ON account.accountid = p.dcp_applicantadministrator_customer
+        WHERE dcp_projectid = p.dcp_projectid
+      )
+      UNION
+      ( -- query for primary applicant from project
+        SELECT
+        dcp_applicant_customer AS id,
+        dcp_applicant_customer$type AS type,
+        CASE
+          WHEN dcp_applicant_customer$type = 'contact' THEN contact.fullname
+          WHEN dcp_applicant_customer$type = 'account' THEN account.name
+        END AS name,
+        'Primary Applicant' AS role,
+        'Project Record' AS source
+        from dcp_project
+        LEFT JOIN contact ON contact.contactid = p.dcp_applicant_customer
+        LEFT JOIN account ON account.accountid = p.dcp_applicant_customer
+        WHERE dcp_projectid = p.dcp_projectid
+      )
+      UNION
+      ( -- query for co-applicant from dcp_projectapplicant table
+        SELECT
+        dcp_projectapplicant.dcp_applicant_customer AS id,
+        dcp_projectapplicant.dcp_applicant_customer$type AS type,
+        CASE
+          WHEN dcp_applicantadministrator_customer$type = 'contact' THEN contact.fullname
+          WHEN dcp_applicantadministrator_customer$type = 'account' THEN account.name
+        END AS name,
+        dcp_projectapplicant.dcp_applicantrole AS role,
+        'Project Applicant Record' AS source
+        FROM dcp_projectapplicant
+        LEFT JOIN dcp_project ON dcp_projectapplicant.dcp_project = p.dcp_projectid
+        LEFT JOIN contact ON contact.contactid = dcp_projectapplicant.dcp_applicant_customer
+        LEFT JOIN account ON account.accountid = dcp_projectapplicant.dcp_applicant_customer
+        WHERE dcp_project.dcp_projectid = p.dcp_projectid
+        AND dcp_applicantrole = 'Co-Applicant'
+      )
     ) pa
-    LEFT JOIN account
-      ON account.accountid = pa.dcp_applicant_customer
   ) AS applicantteam,
   (
     SELECT json_agg(json_build_object(

@@ -12,7 +12,11 @@ SELECT dcp_project.*,
   STRING_AGG(DISTINCT actions.dcp_ulurpnumber, ';') AS ulurpnumbers,
   STRING_AGG(DISTINCT dcp_projectbbl.dcp_validatedblock, ';') AS blocks,
   STRING_AGG(DISTINCT dcp_projectbbl.dcp_bblnumber, ';') as bbls,
-  STRING_AGG(DISTINCT applicantteams.name, ';') AS applicants,
+--  STRING_AGG(DISTINCT applicantteams.name, ';') AS applicants,
+  CASE
+    WHEN dcp_applicant_customer$type = 'contact' THEN contact.fullname
+    WHEN dcp_applicant_customer$type = 'account' THEN account.name
+  END AS applicants,
   STRING_AGG(DISTINCT keywords.dcp_keyword, ';') AS keywords,
   lastmilestonedates.lastmilestonedate
 FROM dcp_project
@@ -100,16 +104,8 @@ LEFT JOIN (
   ON actions.dcp_project = dcp_project.dcp_projectid
 LEFT JOIN dcp_projectbbl
   ON dcp_projectbbl.dcp_project = dcp_project.dcp_projectid
-LEFT JOIN (
-  SELECT dcp_project, CASE WHEN pa.dcp_name IS NOT NULL THEN pa.dcp_name ELSE account.name END as name
-  FROM dcp_projectapplicant pa
-  LEFT JOIN account
-  ON account.accountid = pa.dcp_applicant_customer
-  WHERE dcp_applicantrole IN ('Applicant', 'Co-Applicant', 'Primary Applicant')
-  AND pa.statuscode = 'Active'
-  ORDER BY dcp_applicantrole ASC
-) applicantteams
-  ON applicantteams.dcp_project = dcp_project.dcp_projectid
+LEFT JOIN contact ON contact.contactid = dcp_project.dcp_applicant_customer
+LEFT JOIN account ON account.accountid = dcp_project.dcp_applicant_customer
 LEFT JOIN (
     SELECT dcp_project, dcp_keyword.dcp_keyword
     FROM dcp_projectkeywords
@@ -147,5 +143,9 @@ LEFT JOIN (
     )x GROUP BY dcp_project
 ) lastmilestonedates
   ON lastmilestonedates.dcp_project = dcp_project.dcp_projectid
-GROUP BY dcp_project.dcp_projectid, dcp_project.dcp_publicstatus, lastmilestonedates.lastmilestonedate
+GROUP BY
+  dcp_project.dcp_projectid,
+  dcp_project.dcp_publicstatus,
+  lastmilestonedates.lastmilestonedate,
+  contact.fullname, account.name
 )
