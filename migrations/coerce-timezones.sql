@@ -8,8 +8,8 @@ DECLARE t RECORD;
 begin
   for t IN select column_name, table_name
     from information_schema.columns
-    where data_type='timezone'
+    where data_type='timestamp'
   loop
-    execute 'alter table ' || t.table_name || ' alter column ' || t.column_name || ' type timezonetz';
+    execute 'alter table ' || t.table_name || ' alter column ' || t.column_name || ' type timestampz';
   end loop;
 end$$;
