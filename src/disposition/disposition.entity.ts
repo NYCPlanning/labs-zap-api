@@ -22,7 +22,8 @@ export const KEYS = [
   'dcp_votingabstainingonrecommendation',
   'dcp_totalmembersappointedtotheboard',
   'dcp_wasaquorumpresent',
-  'dcp_projectaction'
+  'dcp_projectaction',
+  'dcp_representing',
 ];
 
 @Entity('dcp_communityboarddisposition')
