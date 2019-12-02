@@ -62,6 +62,7 @@ export class DispositionController {
   async update(@Body() body, @Param('id') id, @Session() session) {
     if (!session) throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
 
+    const { contactid } = session;
     const attributes = await deserialize(body);
     const whitelistedAttrs = pick(attributes, ATTRS_WHITELIST);
 
@@ -69,6 +70,14 @@ export class DispositionController {
     // update CRM first
     // then, update the database
     try {
+      const { dcp_recommendationsubmittedby } = await this.dispositionRepository.findOneOrFail(id);
+      console.log(contactid);
+      // check that the person updating the disposition is the person who submitted the dispo
+      // also check if it's imposter_id enabled
+      if ((dcp_recommendationsubmittedby !== contactid) && !this.config.get('CRM_IMPOSTER_ID')) {
+        throw new Error('Not authorized to edit this record.');
+      }
+
       await this.dynamicsWebApi.update('dcp_communityboarddispositions', id, whitelistedAttrs);
       await this.dispositionRepository.update(id, whitelistedAttrs);
     } catch (e) {
