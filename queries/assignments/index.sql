@@ -46,7 +46,6 @@ lups_review_milestones AS (
 lups_dispositions_status AS (
   SELECT
     lups_project_assignments_all.*,
-    dcp_communityboarddisposition.dcp_visibility AS dcp_visibility,
     dcp_communityboarddisposition.statecode AS statecode, -- inactive or active
     dcp_communityboarddisposition.statuscode AS statuscode -- more descriptive status of draft, saved, submitted, deactivated
   FROM
@@ -63,7 +62,6 @@ lups_dispositions_status AS (
       OR (dcp_communityboarddisposition.dcp_representing = 'Community Board' AND lups_project_assignments_all.dcp_lupteammemberrole = 'CB')
     )
   GROUP BY
-    dcp_communityboarddisposition.dcp_visibility,
     dcp_communityboarddisposition.statecode,
     dcp_communityboarddisposition.statuscode,
     lups_project_assignments_all.dcp_project,
@@ -97,7 +95,6 @@ lups_project_assignments_with_tab AS (
     -- note: the following attributes aren't used in the assignment model; they're only included to help verify that the tab logic is correct
     projects_public_statuses.dcp_publicstatus,
     lups_review_milestones.statuscode AS milestone_statuscode,
-    lups_dispositions_status.dcp_visibility AS disp_dcp_visibility,
     lups_dispositions_status.statecode AS disp_statecode,
     lups_dispositions_status.statuscode AS disp_statuscode
   FROM
@@ -112,7 +109,7 @@ lups_project_assignments_with_tab AS (
 
 -- filter the previous table; we only want to see the BB assignment card for to-review projects and post-cert projects in upcoming
 lups_project_assignments_filtered AS (
-  SELECT
+  SELECT DISTINCT
     assignment_id AS id,
     dcp_lupteammemberrole,
     dcp_project AS project_id,
