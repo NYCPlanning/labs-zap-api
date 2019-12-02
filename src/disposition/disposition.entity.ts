@@ -47,12 +47,6 @@ export class Disposition {
   dcp_recommendationsubmittedby: string;
 
   @Column()
-  form_completer_name: string;
-
-  @Column()
-  form_completer_title: string;
-
-  @Column()
   dcp_boroughpresidentrecommendation: string;
 
   @Column()
