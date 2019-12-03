@@ -11,6 +11,14 @@ import { Disposition } from './../src/disposition/disposition.entity';
 
 class DispoMock {
   update() {} // noop
+
+  findOneOrFail() {
+    return {
+      // no idea where this id is coming from!
+      // i believe it's the uat2 static test user
+      dcp_recommendationsubmittedby: '56b08864-500d-ea11-a9a9-001dd83080ab',
+    };
+  }
 }
 
 describe('Disposition Patch', () => {

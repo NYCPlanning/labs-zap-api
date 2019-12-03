@@ -2,6 +2,7 @@ import * as pgp from 'pg-promise';
 import { Controller, Get, Query, Session, HttpException, HttpStatus } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 import { Serializer } from 'jsonapi-serializer';
+import { ContactService } from '../contact/contact.service';
 import { getQueryFile } from '../_utils/get-query-file';
 import { KEYS as ASSIGNMENT_KEYS } from './assignment.entity';
 import { KEYS as DISPOSITION_KEYS } from '../disposition/disposition.entity';
@@ -14,18 +15,29 @@ const projectQuery = getQueryFile('/projects/project.sql');
 
 @Controller('assignments')
 export class AssignmentController {
+  constructor(
+    private readonly contactService: ContactService,
+  ) {}
+
   @Get('/')
   async index(@Query() query, @Session() session) {
     if (!session) throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
 
-    const { contactid } = session;
-    const { tab = 'to-review' } = query;
+    let { contactid } = session;
+    const {
+      tab = 'to-review',
+      email = '',
+    } = query;
 
     // we have different queries for LUPP things
     if (tab && contactid) {
       // one of 'archive', 'reviewed', 'to-review', 'upcoming'
       if (!['archive', 'reviewed', 'to-review', 'upcoming'].includes(tab)) {
         throw new Error('Must be one of archive, reviewed, to-review, upcoming');
+      }
+
+      if (email) {
+        ({ contactid } = await this.contactService.findByEmail(email));
       }
 
       const SQL = pgp.as.format(userAssignmentsQuery, {
@@ -52,9 +64,7 @@ export class AssignmentController {
         ref: 'dcp_name',
         attributes: PROJECT_KEYS,
         actions: {
-          ref(project, action) {
-            return `${project.dcp_name}-${action.actioncode}`;
-          },
+          ref: 'id',
           attributes: ACTION_KEYS,
         },
         milestones: {

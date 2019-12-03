@@ -17,7 +17,7 @@ describe('Login', () => {
 
   beforeAll(async () => {
     contactMock = new class {
-      findOne() {}
+      findByEmail() {}
     };
 
     configMock = new ConfigService('test.env');
@@ -42,7 +42,7 @@ describe('Login', () => {
   });
 
   it('runs /login with accessToken and provides a new token', () => {
-    jest.spyOn(contactMock, 'findOne').mockImplementation(() => ({ contactid: 'foo' }));
+    jest.spyOn(contactMock, 'findByEmail').mockImplementation(() => ({ contactid: 'foo' }));
 
     return doLogin(app.getHttpServer(), request)
       .expect(200)
@@ -50,7 +50,7 @@ describe('Login', () => {
   });
 
   it('runs /login with accessToken and throws correct error if email not found in DB', () => {
-    jest.spyOn(contactMock, 'findOne').mockImplementation(() => {
+    jest.spyOn(contactMock, 'findByEmail').mockImplementation(() => {
       throw new Error('Not found');
     });
 

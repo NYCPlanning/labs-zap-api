@@ -12,6 +12,8 @@ export const KEYS = [
   'dcp_votelocation',
   'dcp_datereceived',
   'dcp_dateofvote',
+  'dcp_nameofpersoncompletingthisform',
+  'fullname',
   'statecode',
   'statuscode',
   'dcp_docketdescription',
@@ -20,12 +22,17 @@ export const KEYS = [
   'dcp_votingabstainingonrecommendation',
   'dcp_totalmembersappointedtotheboard',
   'dcp_wasaquorumpresent',
+  'dcp_projectaction',
+  'dcp_representing',
 ];
 
 @Entity('dcp_communityboarddisposition')
 export class Disposition {
   @PrimaryColumn({ name: 'dcp_communityboarddispositionid' })
   id: string;
+
+  @Column()
+  dcp_nameofpersoncompletingthisform: string
 
   @Column()
   dcp_publichearinglocation: string;
@@ -38,12 +45,6 @@ export class Disposition {
 
   @Column()
   dcp_recommendationsubmittedby: string;
-
-  @Column()
-  form_completer_name: string;
-
-  @Column()
-  form_completer_title: string;
 
   @Column()
   dcp_boroughpresidentrecommendation: string;
@@ -89,4 +90,7 @@ export class Disposition {
 
   @Column()
   dcp_wasaquorumpresent: string;
+
+  @Column()
+  dcp_projectaction: string;
 }
