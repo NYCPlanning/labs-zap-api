@@ -16,7 +16,8 @@ WITH lups_project_assignments_all AS (
 projects_public_statuses AS (
   SELECT
     dcp_projectid,
-    dcp_publicstatus
+    dcp_publicstatus,
+    statecode
   FROM
     dcp_project
   WHERE
@@ -74,11 +75,10 @@ lups_project_assignments_with_tab AS (
   SELECT DISTINCT
     CASE
       WHEN
-        projects_public_statuses.dcp_publicstatus IN ('Approved', 'Withdrawn/Terminated/Disapproved', 'Disapproved')
+        projects_public_statuses.statecode = 'Inactive'
         THEN 'archive'
       WHEN
         lups_review_milestones.statuscode = 'Not Started'
-        OR projects_public_statuses.dcp_publicstatus = 'Filed' -- included bc sometimes the milestone status isn't filled in
         THEN 'upcoming'
       WHEN
         lups_review_milestones.statuscode IN ('In Progress', 'Completed')
