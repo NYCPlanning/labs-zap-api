@@ -17,8 +17,7 @@ SELECT dcp_project.*,
     WHEN dcp_applicant_customer$type = 'contact' THEN contact.fullname
     WHEN dcp_applicant_customer$type = 'account' THEN account.name
   END AS applicants,
-  STRING_AGG(DISTINCT keywords.dcp_keyword, ';') AS keywords,
-  lastmilestonedates.lastmilestonedate
+  STRING_AGG(DISTINCT keywords.dcp_keyword, ';') AS keywords
 FROM dcp_project
 LEFT JOIN (
   SELECT *
@@ -114,7 +113,7 @@ LEFT JOIN (
 ) keywords
 ON keywords.dcp_project = dcp_project.dcp_projectid
 LEFT JOIN (
-  SELECT dcp_project, MAX(dcp_actualenddate) as lastmilestonedate FROM (
+  SELECT dcp_project FROM (
     SELECT dcp_project, dcp_milestone.dcp_name, dcp_actualenddate, dcp_milestone.dcp_milestoneid FROM dcp_projectmilestone mm
       LEFT JOIN dcp_milestone
          ON mm.dcp_milestone = dcp_milestone.dcp_milestoneid
@@ -146,6 +145,5 @@ LEFT JOIN (
 GROUP BY
   dcp_project.dcp_projectid,
   dcp_project.dcp_publicstatus,
-  lastmilestonedates.lastmilestonedate,
   contact.fullname, account.name
 )
