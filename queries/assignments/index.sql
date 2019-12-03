@@ -234,6 +234,11 @@ SELECT
       AND disp.dcp_recommendationsubmittedby = ${id} -- plugs in contactid
       AND disp.dcp_visibility IN ('General Public', 'LUP')
       AND disp.statuscode <> 'Deactivated'
+      AND (
+        (disp.dcp_representing = 'Borough President' AND lup.dcp_lupteammemberrole = 'BP')
+        OR (disp.dcp_representing = 'Borough Board' AND lup.dcp_lupteammemberrole = 'BB')
+        OR (disp.dcp_representing = 'Community Board' AND lup.dcp_lupteammemberrole = 'CB')
+      )
   ) AS dispositions,
   (
     SELECT json_agg(json_build_object(
