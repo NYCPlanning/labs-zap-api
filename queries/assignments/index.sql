@@ -814,7 +814,7 @@ SELECT
               'dcp_ulurpnumber', pact.dcp_ulurpnumber,
               'recommendationsubmittedby', disp.dcp_recommendationsubmittedby,
               'fullname', contact.fullname,
-              'representing', disp.dcp_representing,
+              'dcp_representing', disp.dcp_representing,
               'dateofpublichearing', disp.dcp_dateofpublichearing,
               'boroughboardrecommendation', disp.dcp_boroughboardrecommendation,
               'communityboardrecommendation', disp.dcp_communityboardrecommendation,
