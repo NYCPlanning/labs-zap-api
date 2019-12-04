@@ -22,7 +22,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "webpack": "webpack --config webpack.config.js",
     "copy-query-files": "cp -R src/project/_queries dist/project/",
-    "postinstall": "yarn run build"
+    "postinstall": "yarn run build",
+    "migrate": "node-pg-migrate"
   },
   "dependencies": {
     "@nestjs/common": "^6.0.0",
@@ -47,6 +48,7 @@
     "nestjs-typeorm-paginate": "^1.0.2",
     "nock": "^11.7.0",
     "node-cache": "^4.2.1",
+    "node-pg-migrate": "^3.23.3",
     "p-limit": "^2.2.1",
     "pg": "^7.12.1",
     "pg-promise": "^9.2.1",
