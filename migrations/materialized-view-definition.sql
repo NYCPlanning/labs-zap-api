@@ -8,7 +8,7 @@ SELECT dcp_project.*,
     WHEN dcp_project.dcp_publicstatus = 'Withdrawn/Terminated/Disapproved' THEN 'Completed'
     ELSE 'Unknown'
   END AS dcp_publicstatus_simp,
-  STRING_AGG(DISTINCT SUBSTRING(actions.dcp_name FROM '^(\\w+)'), ';') AS actiontypes,
+  STRING_AGG(DISTINCT LEFT(actions.dcp_name, 2), ';') AS actiontypes,
   STRING_AGG(DISTINCT actions.dcp_ulurpnumber, ';') AS ulurpnumbers,
   STRING_AGG(DISTINCT dcp_projectbbl.dcp_validatedblock, ';') AS blocks,
   STRING_AGG(DISTINCT dcp_projectbbl.dcp_bblnumber, ';') as bbls,

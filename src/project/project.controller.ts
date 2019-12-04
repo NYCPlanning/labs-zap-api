@@ -13,7 +13,7 @@ import { ProjectService } from './project.service';
 import { TilesService } from './tiles/tiles.service';
 import { GeometriesService } from './geometries/geometries.service';
 
-@Controller('projects')
+@Controller()
 export class ProjectController {
   constructor(
     private projectService: ProjectService,
@@ -21,7 +21,7 @@ export class ProjectController {
     private geometriesService: GeometriesService,
   ) {}
 
-  @Get('/update-geometries/:id')
+  @Get('/projects/update-geometries/:id')
   async updateGeometries(@Param('id') id, @Query('API_KEY') apiKey) {
     const isValidKey = this.geometriesService.validateAPIKey(apiKey);
     const isValidID = this.geometriesService.validateProjectID(id);
@@ -32,23 +32,23 @@ export class ProjectController {
     return await this.geometriesService.upsertGeoms(id);
   }
 
-  @Get('/new-filed')
+  @Get('/projects/new-filed')
   async synchronizeGeometries() {
     return await this.geometriesService.synchronizeGeoms();
   }
 
   // Extract the raw Express instance and pass to the query method
-  @Get('/')
+  @Get('/projects/')
   async index(@Req() request: Request) {
     return await this.projectService.queryProjects(request);
   }
 
-  @Get('/:id')
+  @Get('/projects/:id')
   async show(@Param() params) {
     return this.projectService.findOne(params.id);
   }
 
-  @Get('/tiles/:tileId/:z/:x/:y.mvt')
+  @Get('/projects/tiles/:tileId/:z/:x/:y.mvt')
   async handleTileRequest(@Req() request: Request, @Res() response) {
     const { type } = request.query;
     const { tileId, x, y, z } = request.params;
@@ -60,5 +60,15 @@ export class ProjectController {
       response.status(204);
     }
     response.send(tile);
+  }
+
+  @Get('/projects.csv')
+  async download(@Param() params, @Req() request: Request, @Res() response) {
+    // renable for now; enable other formats soon
+    const filetype = 'csv';
+    const csv = await this.projectService.handleDownload(request, filetype);
+
+    response.setHeader('Content-type', 'text/csv');
+    response.send(csv);
   }
 }

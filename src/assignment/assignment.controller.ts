@@ -56,6 +56,8 @@ export class AssignmentController {
     const sanitizedRecords = records.map(record => {
       if (!record.dispositions) record.dispositions = [];
       if (!record.milestones) record.milestones = [];
+
+      return record;
     });
 
     const AssignmentSerializer = new Serializer('assignments', {
@@ -92,6 +94,6 @@ export class AssignmentController {
       meta: { ...opts },
     });
 
-    return AssignmentSerializer.serialize(records);
+    return AssignmentSerializer.serialize(sanitizedRecords);
   }
 }

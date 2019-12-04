@@ -41,6 +41,7 @@
     "cookie-parser": "^1.4.4",
     "dotenv": "^8.1.0",
     "eol": "^0.9.1",
+    "json2csv": "^4.5.4",
     "jsonapi-serializer": "^3.6.5",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.24.0",
