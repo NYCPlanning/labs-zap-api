@@ -73,7 +73,7 @@ export const MILESTONE_KEYS = [
   'display_name',
   'display_date',
   'display_date2',
-  'dcp_milestoneoutcome',
+  'outcome',
   'milestone_links',
   'is_revised',
 ];
