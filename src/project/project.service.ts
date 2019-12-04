@@ -12,6 +12,7 @@ import { bbox, buffer, point } from '@turf/turf';
 import { ConfigService } from '../config/config.service';
 import { TilesService } from './tiles/tiles.service';
 import { getQueryFile } from '../_utils/get-query-file';
+import { handleDownload } from './_utils/handle-download';
 import { buildProjectsSQL } from './_utils/build-projects-sql';
 import { Project, KEYS as PROJECT_KEYS, ACTION_KEYS, MILESTONE_KEYS } from './project.entity';
 import { KEYS as DISPOSITION_KEYS } from '../disposition/disposition.entity';
@@ -144,6 +145,15 @@ export class ProjectService {
         pageCount,
       },
     });
+  }
+
+  async handleDownload(request, filetype) {
+    const SQL = buildProjectsSQL(request, 'csv_download');
+    const { data } = await this.queryProjects(request);
+
+    const deserializedData = data.map(jsonApiRecord => ({ id: jsonApiRecord.id, ...jsonApiRecord.attributes }));
+
+    return handleDownload(filetype, deserializedData);
   }
 
   // Serializes an array of objects into a JSON:API document

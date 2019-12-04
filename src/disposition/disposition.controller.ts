@@ -71,7 +71,7 @@ export class DispositionController {
     // then, update the database
     try {
       const { dcp_recommendationsubmittedby } = await this.dispositionRepository.findOneOrFail(id);
-      console.log(contactid);
+
       // check that the person updating the disposition is the person who submitted the dispo
       // also check if it's imposter_id enabled
       if ((dcp_recommendationsubmittedby !== contactid) && !this.config.get('CRM_IMPOSTER_ID')) {
