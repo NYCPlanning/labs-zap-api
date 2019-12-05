@@ -55,13 +55,23 @@ Create `development.env` with all the required environment variables.
 Start the development server.  `yarn run start`
 
 ### Local Database
-### TODO: Fix docker deployment, this may not work >
+#### Via Docker:
+(TODO: Fix docker deployment, this may not work)
 
 - To start a local PostGIS instance, run `docker run --name zap-development -p 5432:5432 -e POSTGRES_PASSWORD=password -d mdillon/postgis`
 - Update `.env` to include DATABASE_URL `DATABASE_URL=postgres://postgres:password@0.0.0.0:5432/postgres`
 - ssh onto the server and create a dump file of the PostgreSQL database `docker exec {containername} pg_dump -U postgres postgres > {filename}`
 - Transfer the file back to local machine `scp {username}@{host}:{path-to-file} {localfilename}`
 - Restore database on your local machine `cat {localfilename} | docker exec -i zap-development psql -U postgres`
+
+#### On metal (i.e. without docker):
+1. Connect to either the staging or prod databases and copy it to your machine locally.
+` /path/to/pg_dump <staging/prod db url> -f <dump_file_name>.sql`
+2. Create a blank database in your local PostGresSQL install.
+3. Import the dump into your newly created local PostGresSQL install.
+`/path/to/psql -d <local db url> -f /path/to/<dump_file_name>.sql`
+
+A DB url example is `postgres://postgres@localhost/database`.
 
 ### Environment Variables
 You'll need to create a `.env` file in the root of the repo, with the following environment variables:
@@ -83,6 +93,48 @@ You'll need to create a `.env` file in the root of the repo, with the following 
 `AIRTABLE_API_KEY` - api key for accessing the airtable with youtube video references
 
 `CRM_IMPOSTER_ID` - ID used to simulate an "in-CRM" user — essentially force a specific CRM id to be returned
+
+### Migrations
+
+Migration files are used to predictably recreate a database schema, like how a commit history recreates a codebase. 
+
+This project uses the [node-pg-migrate](https://github.com/salsita/node-pg-migrate) Node tool to create and run SQL-based migrations on the PostGresSQL database.
+
+Migration files are stored the `/migrations folder`. They are automatically placed there upon creation.
+
+Always use `node-pg-migrate` to create, manage and run migrations. The tool will make sure migrations are named so that they run in the order they are created.
+
+This project has aliased `node-pg-migrate` as `npm run migrate` (through the `scripts` property in `package.json`. So to use `node-pg-migrate`, in the terminal run
+```
+npm run migrate <command> <options>
+```
+
+*IMPORTANT NOTE:* One caveat with migrations in this project is that they do not create the database from scratch. They should only be used after manually creating and seeding the (local or staging/prod) database. For a local database, this means after recreating it using either the "via Docker" or "on metal" instructions above. For staging and production databases, this means after the ETL scripts have finished according to the "Skyvia: Dropping then recreating tables" document. I.e. after step 13. 
+
+Since the existing migrations are run on a database schema created elsewhere, it makes some assumptions about the state of the database.
+One assumption is that the indexes that the migrations will create do not already exist. If they already exist, running the migrations will throw an error.
+In that case, go into the `create-index*` migrations and uncomment the `dropIndexes(pgm);` function call at the top of the `exports.up` function.
+This will make sure the indexes are dropped before they are created again.
+
+#### Create a new migration file
+```
+npm run migrate create <migration name with spaces>
+```
+
+#### Run all migrations (normal use)
+```
+DATABASE_URL=<db url> npm run migrate up
+```
+The `DATABASE_URL` parameter This will override any DATABASE_URL environment variable that is set.
+
+This command will run all migrations in the `/migrations` folder in the order they were created.
+
+#### Undo and redo migrations
+
+You can also undo migrations and redo them. You can use the `down` commmand to go backwards, or `redo` to go backwards and forwards again. 
+
+For these commands, [see the CLI docs here](https://github.com/salsita/node-pg-migrate/blob/master/docs/cli.md).
+
 
 ### GDAL Dependency
 
