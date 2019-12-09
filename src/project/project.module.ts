@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Project } from './project.entity';
+import { ScheduleService } from './project.schedule';
 import { ProjectController } from './project.controller';
 import { ProjectService } from './project.service';
 import { ConfigModule } from '../config/config.module';
@@ -16,6 +17,6 @@ import { GeometriesModule } from './geometries/geometries.module';
   	GeometriesModule,
   ],
   controllers: [ProjectController],
-  providers: [ProjectService]
+  providers: [ProjectService, ScheduleService]
 })
 export class ProjectModule {}

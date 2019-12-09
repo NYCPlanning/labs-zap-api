@@ -156,6 +156,11 @@ export class ProjectService {
     return handleDownload(filetype, deserializedData);
   }
 
+  // triggers an update to the normalized_projects view
+  async refreshMaterializedView() {
+    this.projectRepository.query('REFRESH MATERIALIZED VIEW normalized_projects;');
+  }
+
   // Serializes an array of objects into a JSON:API document
   serialize(records, opts?: object): Serializer {
     const ProjectSerializer = new Serializer('projects', {
