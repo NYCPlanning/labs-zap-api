@@ -46,6 +46,7 @@
     "jsonapi-serializer": "^3.6.5",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.24.0",
+    "nest-schedule": "^0.6.3",
     "nestjs-typeorm-paginate": "^1.0.2",
     "nock": "^11.7.0",
     "node-cache": "^4.2.1",
