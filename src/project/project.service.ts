@@ -58,8 +58,8 @@ export class ProjectService {
   }
 
   // TODO: Use the ORM for this instead of buildProjectsSQL
-  async queryProjects(request: Request) {
-    const projects = await this.projectRepository.query(buildProjectsSQL(request));
+  async queryProjects(request: Request, type = 'filter') {
+    const projects = await this.projectRepository.query(buildProjectsSQL(request, type));
     let meta = extractMeta(projects);
 
     const { query: { page = '1' } } = request;
@@ -149,7 +149,7 @@ export class ProjectService {
 
   async handleDownload(request, filetype) {
     const SQL = buildProjectsSQL(request, 'csv_download');
-    const { data } = await this.queryProjects(request);
+    const { data } = await this.queryProjects(request, 'download');
 
     const deserializedData = data.map(jsonApiRecord => ({ id: jsonApiRecord.id, ...jsonApiRecord.attributes }));
 
