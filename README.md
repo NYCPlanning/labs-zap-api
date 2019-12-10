@@ -94,6 +94,23 @@ You'll need to create a `.env` file in the root of the repo, with the following 
 
 `CRM_IMPOSTER_ID` - ID used to simulate an "in-CRM" user — essentially force a specific CRM id to be returned
 
+Others:
+
+`ALLOWED_HOSTS` - List of allowed CORS request hosts
+`AUTHORITY_HOST_URL` - Used for ADAL login
+`CLIENT_ID` - Used for ADAL login
+`CLIENT_SECRET` - Used for ADAL login
+`CRM_HOST` - Used to query CRM API
+`CRM_ADMIN_SERVICE_USER` - Used for /document uploads. Should be an account in CRM with admin permissions
+`CRM_SIGNING_SECRET` - Used to sign JWT for this app's JWTs
+`CRM_URL_PATH` - Used to query CRM API
+`NYCID_CONSOLE_PASSWORD` - Used to decrypt/validate NYCID JWTs
+`NYCID_HOST` - NYCID used. Not currently used.
+`NYCID_USERNAME` - Username for NYCID. Not currently used.
+`TENANT_ID` - Used for ADAL login
+`TOKEN_PATH` - Used for ADAL login
+`USER_API_KEY` - Used for ZAP API end users to update geoms
+
 ### Migrations
 
 Migration files are used to predictably recreate a database schema, like how a commit history recreates a codebase. 
