@@ -411,7 +411,7 @@ SELECT
         'dcp_wasaquorumpresent', disp.dcp_wasaquorumpresent,
         'recommendationsubmittedby', disp.dcp_recommendationsubmittedby,
         'fullname', contact.fullname,
-        'representing', disp.dcp_representing,
+        'dcp_representing', disp.dcp_representing,
         'dateofpublichearing', disp.dcp_dateofpublichearing,
         'boroughboardrecommendation', disp.dcp_boroughboardrecommendation,
         'communityboardrecommendation', disp.dcp_communityboardrecommendation,
