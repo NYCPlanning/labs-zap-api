@@ -68,6 +68,7 @@ export const MILESTONE_KEYS = [
   'statuscode',
   'dcp_milestonesequence',
   'dcp_remainingplanneddayscalculated',
+  'dcp_remainingplanneddays',
   'dcp_goalduration',
   'dcp_actualdurationasoftoday',
   'display_description',
