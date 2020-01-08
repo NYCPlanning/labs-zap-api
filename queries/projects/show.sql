@@ -150,6 +150,7 @@ SELECT
       'dcp_milestone', m.dcp_milestone,
       'dcp_milestonesequence', m.dcp_milestonesequence,
       'dcp_remainingplanneddayscalculated', m.dcp_remainingplanneddayscalculated,
+      'dcp_remainingplanneddays', m.dcp_remainingplanneddays,
       'dcp_actualdurationasoftoday', m.dcp_actualdurationasoftoday,
       'display_sequence', m.display_sequence,
       'display_name', m.display_name,
