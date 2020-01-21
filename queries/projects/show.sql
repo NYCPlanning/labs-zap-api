@@ -367,17 +367,17 @@ SELECT
         dcp_projectapplicant.dcp_applicant_customer AS id,
         dcp_projectapplicant.dcp_applicant_customer$type AS type,
         CASE
-          WHEN dcp_applicantadministrator_customer$type = 'contact' THEN contact.fullname
-          WHEN dcp_applicantadministrator_customer$type = 'account' THEN account.name
+          WHEN dcp_projectapplicant.dcp_applicant_customer$type = 'contact' THEN contact.fullname
+          WHEN dcp_projectapplicant.dcp_applicant_customer$type = 'account' THEN account.name
         END AS name,
         dcp_projectapplicant.dcp_applicantrole AS role,
         'Project Applicant Record' AS source
         FROM dcp_projectapplicant
-        LEFT JOIN dcp_project ON dcp_projectapplicant.dcp_project = p.dcp_projectid
         LEFT JOIN contact ON contact.contactid = dcp_projectapplicant.dcp_applicant_customer
         LEFT JOIN account ON account.accountid = dcp_projectapplicant.dcp_applicant_customer
-        WHERE dcp_project.dcp_projectid = p.dcp_projectid
+        WHERE dcp_projectapplicant.dcp_project = p.dcp_projectid
         AND dcp_applicantrole = 'Co-Applicant'
+        AND dcp_projectapplicant.statecode = 'Inactive'
       )
     ) pa
   ) AS applicantteam,
