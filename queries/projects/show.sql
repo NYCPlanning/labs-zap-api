@@ -377,7 +377,7 @@ SELECT
         LEFT JOIN account ON account.accountid = dcp_projectapplicant.dcp_applicant_customer
         WHERE dcp_projectapplicant.dcp_project = p.dcp_projectid
         AND dcp_applicantrole = 'Co-Applicant'
-        AND dcp_projectapplicant.statecode = 'Inactive'
+        AND dcp_projectapplicant.statecode <> 'Inactive'
       )
     ) pa
   ) AS applicantteam,
