@@ -10,4 +10,10 @@ export class Contact {
 
   @Column()
   fullname: string;
+
+  @Column()
+  statecode: string;
+
+  @Column()
+  statuscode: string;
 }
