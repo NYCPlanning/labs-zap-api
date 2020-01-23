@@ -34,10 +34,29 @@ export class AuthService {
   }
 
   /**
-   * Verifies an NYCIDToken. Then, looks up a contact associated with
-   * that NYC.ID token using provided email. Lastly, signs a new token
-   * which includes the contact ID for that.
-   *
+   * This method automates how authentication works in this app. It is intended for
+   * debugging purposes. There are two kinds of JWTs in play in this application:
+   * 
+   *  - NYC.ID JWT
+   *  - Our JWT
+   * 
+   * In order to login to this application, one must first be authenticated
+   * through NYC.ID. Once authenticated, NYC.ID redirects you back to this
+   * application with a JWT that includes your e-mail address. That is what
+   * you are seeing on line 39: we are generating a mock NYC.ID JWT and signing
+   * it with the NYCID_CONSOLE_PASSWORD as if you were authenticated via NYC.ID.
+   * 
+   * This method recreates the NYC.ID authentication step for use in local 
+   * development. The intent is to enable local debugging that is closer to
+   * how authentication actually works.
+   * 
+   * Once the cookie is printed in the terminal, you can copy that cookie and paste
+   * it into headers of requests you're making. If you're looking at the API and
+   * want it to persist, you can use the Chrome Inspector to add the token via the
+   * Application tab.
+   * 
+   * See this PR for full discussion: https://github.com/NYCPlanning/zap-api/pull/74#discussion_r370749677.
+   * 
    * @param      {<type>}  NYCIDToken  The nycid token
    */
   public async generateNewToken(NYCIDToken: string): Promise<string> {

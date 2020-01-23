@@ -96,7 +96,11 @@ You'll need to create a `.env` file in the root of the repo, with the following 
 
 `AIRTABLE_API_KEY` - api key for accessing the airtable with youtube video references
 
+`SKIP_AUTH` - skips the authentication step and uses an email provided in variable `CRM_IMPOSTER_EMAIL`
+
 `CRM_IMPOSTER_EMAIL` - when using SKIP_AUTH, this is the e-mail used to generate an access cookie
+
+** NOTE: If CRM_IMPOSTER_EMAIL and SKIP_AUTH are configured correctly, the server log will print a new cookie. This cookie can be inserted into request headers for debugging **
 
 #### Deprecated:
 
