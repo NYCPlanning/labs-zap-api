@@ -21,7 +21,6 @@ export class AuthService {
   NYCID_CONSOLE_PASSWORD = '';
 
   // development environment features
-  SKIP_AUTH = false;
   CRM_IMPOSTER_ID = '';
 
   constructor(
@@ -31,7 +30,6 @@ export class AuthService {
     this.CRM_SIGNING_SECRET = this.config.get('CRM_SIGNING_SECRET');
     this.NYCID_CONSOLE_PASSWORD = this.config.get('NYCID_CONSOLE_PASSWORD');
 
-    this.SKIP_AUTH = this.config.get('SKIP_AUTH');
     this.CRM_IMPOSTER_ID = this.config.get('CRM_IMPOSTER_ID');
   }
 
@@ -44,13 +42,6 @@ export class AuthService {
    */
   public async generateNewToken(NYCIDToken: string): Promise<string> {
     const { CRM_IMPOSTER_ID } = this;
-
-    if (this.SKIP_AUTH) {
-      console.log('Warning! SKIP_AUTH is set to true. Your app is unsecured!');
-
-      return this.signNewToken(CRM_IMPOSTER_ID);
-    }
-
     const { mail, exp } = this.verifyNYCIDToken(NYCIDToken);
     const { contactid } = await this.lookupContact(mail);
 
@@ -64,14 +55,6 @@ export class AuthService {
    */
   public validateCurrentToken(token: string) {
     const { CRM_IMPOSTER_ID } = this;
-
-    if (this.SKIP_AUTH) {
-      console.log('Warning! SKIP_AUTH is set to true. Your app is unsecured!');
-
-      const newToken = this.signNewToken(CRM_IMPOSTER_ID);
-
-      return this.verifyCRMToken(newToken);
-    }
 
     return this.verifyCRMToken(token);
   }
