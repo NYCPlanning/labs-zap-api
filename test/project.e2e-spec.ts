@@ -58,5 +58,5 @@ describe('Project Get', () => {
         expect(project).toHaveProperty('attributes.lastmilestonedate');
         expect(project).toHaveProperty('attributes.ulurpnumbers');
       });
-  }, 30000);
+  }, 60000);
 });

@@ -17,13 +17,18 @@ export class ContactService {
     private readonly config: ConfigService,
   ) {}
 
+  activeContacts() {
+    return this.contactRepository.createQueryBuilder('active_contacts')
+      .where('active_contacts.statuscode = :statuscode', { statuscode: 'Active' });
+  }
+
   async findOne(opts: any): Promise<Contact> {
     return this.contactRepository.findOneOrFail(opts);
   }
 
   async findByEmail(email): Promise<Contact> {
-    return this.contactRepository.findOneOrFail({
-      emailaddress1: ILike(email),
-    });
+    return this.activeContacts()
+      .andWhere('emailaddress1 ILIKE :email', { email })
+      .getOne();
   }
 }

@@ -21,7 +21,6 @@ export class AuthService {
   NYCID_CONSOLE_PASSWORD = '';
 
   // development environment features
-  SKIP_AUTH = false;
   CRM_IMPOSTER_ID = '';
 
   constructor(
@@ -31,26 +30,37 @@ export class AuthService {
     this.CRM_SIGNING_SECRET = this.config.get('CRM_SIGNING_SECRET');
     this.NYCID_CONSOLE_PASSWORD = this.config.get('NYCID_CONSOLE_PASSWORD');
 
-    this.SKIP_AUTH = this.config.get('SKIP_AUTH');
     this.CRM_IMPOSTER_ID = this.config.get('CRM_IMPOSTER_ID');
   }
 
   /**
-   * Verifies an NYCIDToken. Then, looks up a contact associated with
-   * that NYC.ID token using provided email. Lastly, signs a new token
-   * which includes the contact ID for that.
-   *
+   * This method automates how authentication works in this app. It is intended for
+   * debugging purposes. There are two kinds of JWTs in play in this application:
+   * 
+   *  - NYC.ID JWT
+   *  - Our JWT
+   * 
+   * In order to login to this application, one must first be authenticated
+   * through NYC.ID. Once authenticated, NYC.ID redirects you back to this
+   * application with a JWT that includes your e-mail address. That is what
+   * you are seeing on line 39: we are generating a mock NYC.ID JWT and signing
+   * it with the NYCID_CONSOLE_PASSWORD as if you were authenticated via NYC.ID.
+   * 
+   * This method recreates the NYC.ID authentication step for use in local 
+   * development. The intent is to enable local debugging that is closer to
+   * how authentication actually works.
+   * 
+   * Once the cookie is printed in the terminal, you can copy that cookie and paste
+   * it into headers of requests you're making. If you're looking at the API and
+   * want it to persist, you can use the Chrome Inspector to add the token via the
+   * Application tab.
+   * 
+   * See this PR for full discussion: https://github.com/NYCPlanning/zap-api/pull/74#discussion_r370749677.
+   * 
    * @param      {<type>}  NYCIDToken  The nycid token
    */
   public async generateNewToken(NYCIDToken: string): Promise<string> {
     const { CRM_IMPOSTER_ID } = this;
-
-    if (this.SKIP_AUTH) {
-      console.log('Warning! SKIP_AUTH is set to true. Your app is unsecured!');
-
-      return this.signNewToken(CRM_IMPOSTER_ID);
-    }
-
     const { mail, exp } = this.verifyNYCIDToken(NYCIDToken);
     const { contactid } = await this.lookupContact(mail);
 
@@ -64,14 +74,6 @@ export class AuthService {
    */
   public validateCurrentToken(token: string) {
     const { CRM_IMPOSTER_ID } = this;
-
-    if (this.SKIP_AUTH) {
-      console.log('Warning! SKIP_AUTH is set to true. Your app is unsecured!');
-
-      const newToken = this.signNewToken(CRM_IMPOSTER_ID);
-
-      return this.verifyCRMToken(newToken);
-    }
 
     return this.verifyCRMToken(token);
   }
