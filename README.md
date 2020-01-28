@@ -18,26 +18,30 @@ $ npm install
 
 ```bash
 # development
-$ npm run start
+$ yarn run start
 
 # watch mode
-$ npm run start:dev
+$ yarn run start:dev
 
 # production mode
-$ npm run start:prod
+$ yarn run start:prod
+
+# imposter development mode (authenticate as a specific user for debugging locally)
+$ CRM_IMPOSTER_EMAIL=<somevalidemail@email.com> yarn run start:dev:skip-auth
+
 ```
 
 ## Test
 
 ```bash
 # unit tests
-$ npm run test
+$ yarn run test
 
 # e2e tests
-$ npm run test:e2e
+$ yarn run test:e2e
 
 # test coverage
-$ npm run test:cov
+$ yarn run test:cov
 ```
 
 ## Requirements
@@ -92,6 +96,14 @@ You'll need to create a `.env` file in the root of the repo, with the following 
 
 `AIRTABLE_API_KEY` - api key for accessing the airtable with youtube video references
 
+`SKIP_AUTH` - skips the authentication step and uses an email provided in variable `CRM_IMPOSTER_EMAIL`
+
+`CRM_IMPOSTER_EMAIL` - when using SKIP_AUTH, this is the e-mail used to generate an access cookie
+
+** NOTE: If CRM_IMPOSTER_EMAIL and SKIP_AUTH are configured correctly, the server log will print a new cookie. This cookie can be inserted into request headers for debugging **
+
+#### Deprecated:
+
 `CRM_IMPOSTER_ID` - ID used to simulate an "in-CRM" user — essentially force a specific CRM id to be returned
 
 Others:
@@ -121,9 +133,9 @@ Migration files are stored the `/migrations folder`. They are automatically plac
 
 Always use `node-pg-migrate` to create, manage and run migrations. The tool will make sure migrations are named so that they run in the order they are created.
 
-This project has aliased `node-pg-migrate` as `npm run migrate` (through the `scripts` property in `package.json`. So to use `node-pg-migrate`, in the terminal run
+This project has aliased `node-pg-migrate` as `yarn run migrate` (through the `scripts` property in `package.json`. So to use `node-pg-migrate`, in the terminal run
 ```
-npm run migrate <command> <options>
+yarn run migrate <command> <options>
 ```
 
 *IMPORTANT NOTE:* One caveat with migrations in this project is that they do not create the database from scratch. They should only be used after manually creating and seeding the (local or staging/prod) database. For a local database, this means after recreating it using either the "via Docker" or "on metal" instructions above. For staging and production databases, this means after the ETL scripts have finished according to the "Skyvia: Dropping then recreating tables" document. I.e. after step 13. 
@@ -135,12 +147,12 @@ This will make sure the indexes are dropped before they are created again.
 
 #### Create a new migration file
 ```
-npm run migrate create <migration name with spaces>
+yarn run migrate create <migration name with spaces>
 ```
 
 #### Run all migrations (normal use)
 ```
-DATABASE_URL=<db url> npm run migrate up
+DATABASE_URL=<db url> yarn run migrate up
 ```
 The `DATABASE_URL` parameter This will override any DATABASE_URL environment variable that is set.
 
@@ -161,7 +173,7 @@ For local development on a Mac, use `brew install gdal` and make sure the comman
 
 You can also use docker to run the api on port 3000 in development:
 
-`docker run -it -v $PWD:/zap-api -p 3000:3000 -w /zap-api geodatagouv/node-gdal npm run devstart`
+`docker run -it -v $PWD:/zap-api -p 3000:3000 -w /zap-api geodatagouv/node-gdal yarn run devstart`
 
 This mounts your code in the docker container, and will use nodemon to restart when you save changes.
 
