@@ -1,4 +1,8 @@
 /* eslint-disable camelcase */
+// Updates line 12 through 18
+// Updated CASE statement for dcp_publicstatus to reflect CRM data updates.
+// dcp_publicstatus values in CRM have been changed to 
+// "Prefiled", "Filed", "In Public Review", "Completed"
 
 exports.shorthands = undefined;
 
