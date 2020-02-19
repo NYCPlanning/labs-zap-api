@@ -18,9 +18,10 @@ WHERE coalesce(dcp_publicstatus_simp, 'Unknown') IN (${dcp_publicstatus:csv})
   ${radiusDistanceQuery^}
   ${blockQuery^}
 ORDER BY lastmilestonedate DESC NULLS LAST,
-CASE WHEN dcp_publicstatus_simp = 'In Public Review' then 1
-      WHEN dcp_publicstatus_simp = 'Filed' then 2
-      WHEN dcp_publicstatus_simp = 'Completed' then 3
-            ELSE 4
+CASE  WHEN dcp_publicstatus_simp = 'In Public Review' then 1
+      WHEN dcp_publicstatus_simp = 'Prefiled' then 2
+      WHEN dcp_publicstatus_simp = 'Filed' then 3
+      WHEN dcp_publicstatus_simp = 'Completed' then 4
+            ELSE 5
         END ASC
 ${paginate^}

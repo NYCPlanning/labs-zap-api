@@ -117,7 +117,7 @@ lups_project_assignments_filtered AS (
   FROM lups_project_assignments_with_tab
   WHERE
     dcp_lupteammemberrole <> 'BB' -- this drops all BB records except for the two conditions below
-    OR (dcp_lupteammemberrole = 'BB' AND tab = 'upcoming' AND dcp_publicstatus = 'Certified/Referred')
+    OR (dcp_lupteammemberrole = 'BB' AND tab = 'upcoming' AND dcp_publicstatus = 'In Public Review')
     OR (dcp_lupteammemberrole = 'BB' AND tab = 'to-review')
 )
 
@@ -433,11 +433,10 @@ SELECT
         dcp_projectcompleted,
         dcp_publicstatus,
         CASE
+          WHEN dcp_publicstatus = 'Prefiled' THEN 'Prefiled'
           WHEN dcp_publicstatus = 'Filed' THEN 'Filed'
-          WHEN dcp_publicstatus = 'Certified/Referred' THEN 'In Public Review'
-          WHEN dcp_publicstatus = 'Approved' THEN 'Completed'
-          WHEN dcp_publicstatus = 'Disapproved' THEN 'Completed'
-          WHEN dcp_publicstatus = 'Withdrawn/Terminated/Disapproved' THEN 'Completed'
+          WHEN dcp_publicstatus = 'In Public Review' THEN 'In Public Review'
+          WHEN dcp_publicstatus = 'Completed' THEN 'Completed'
           ELSE 'Unknown'
         END AS dcp_publicstatus_simp,
         (
