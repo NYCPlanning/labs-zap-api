@@ -26,11 +26,10 @@ SELECT
   dcp_femafloodzonev,
   dcp_projectcompleted,
   CASE
+    WHEN p.dcp_publicstatus = 'Prefiled' THEN 'Prefiled'
     WHEN p.dcp_publicstatus = 'Filed' THEN 'Filed'
-    WHEN p.dcp_publicstatus = 'Certified/Referred' THEN 'In Public Review'
-    WHEN p.dcp_publicstatus = 'Approved' THEN 'Completed'
-    WHEN p.dcp_publicstatus = 'Disapproved' THEN 'Completed'
-    WHEN p.dcp_publicstatus = 'Withdrawn/Terminated/Disapproved' THEN 'Completed'
+    WHEN p.dcp_publicstatus = 'In Public Review' THEN 'In Public Review'
+    WHEN p.dcp_publicstatus = 'Completed' THEN 'Completed'
     ELSE 'Unknown'
   END AS dcp_publicstatus_simp,
   (

@@ -1,12 +1,7 @@
 [![CircleCI](https://circleci.com/gh/NYCPlanning/labs-zap-api/tree/develop.svg?style=svg)](https://circleci.com/gh/NYCPlanning/labs-zap-api/tree/develop)
 
-# labs-zap-api
-An express.js api that serves project data from the Zoning Application Portal (ZAP).
-
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+# Labs Zap API
+An [Nest](https://github.com/nestjs/nest) api that serves project data from the Zoning Application Portal (ZAP).
 
 ## Installation
 
@@ -211,7 +206,7 @@ Use query Parameters for filtering:
 
     `dcp_femafloodzoneshadedx` *default false* - flood zone boolean
 
-    `dcp_publicstatus[] ` *default ['Filed','Certified/Referred','Approved','Disapproved','Withdrawn/Terminated/Disapproved', 'Unknown']* - the project's public status
+    `dcp_publicstatus[] ` *default ['Prefiled', Filed', 'In Public Review', Completed']* - the project's public status
 
     `dcp_certifiedreferred[]` - array of unix epoch timestamps to filter for date range
 
