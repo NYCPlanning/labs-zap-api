@@ -225,58 +225,21 @@ export const CRMWebAPI = {
 
     return new Promise((resolve, reject) => {
       request.post(options, (error, response, body) => {
-        const encoding = response.headers['content-encoding'];
-        if(error || (response.status != 200 && response.status != 204 && response.status != 1223)){
-          const parseError = jsonText => {
-            // Bug: sometimes CRM returns 'object reference' error
-            // Fix: if we retry error will not show again
-            const json_string = jsonText.toString('utf-8');
-            var result = JSON.parse(json_string, this.dateReviver);
-            var err = this.parseErrorMessage(result);
-            reject(err);
-          };
-          if (encoding && encoding.indexOf('gzip') >= 0) {
-            zlib.gunzip(body, (err, dezipped) => {
-              parseError(dezipped);
-            });
-          }
-          else{
-            parseError(body);
-
-          }
-        }
-        else if (response.status === 200) {
-          const parseResponse = jsonText => {
-            const json_string = jsonText.toString('utf-8');
-            var result = JSON.parse(json_string, this.dateReviver);
-            resolve(result);
-          };
-
-          if (encoding && encoding.indexOf('gzip') >= 0) {
-            zlib.gunzip(body, (err, dezipped) => {
-              parseResponse(dezipped);
-            });
-          }
-          else{
-            parseResponse(body);
-          }
-        }
-        else if(response.status === 204 || response.status === 1223){
-          const uri = response.headers.get("OData-EntityId");
-          if (uri) {
-            // create request - server sends new id
-            const regExp = /\(([^)]+)\)/;
-            const matches = regExp.exec(uri);
-            const newEntityId = matches[1];
-            resolve(newEntityId);
-          }
-          else {
-            // other type of request - no response
-            resolve();
+        if(body){
+          try{
+            const jsonBody = JSON.parse(body);
+            if(jsonBody.error){
+              reject(this.parseErrorMessage(jsonBody));
+            }
+            else{
+              resolve(jsonBody.LocationId);
+            }
+          }catch(error){
+            reject(body);
           }
         }
         else{
-          resolve();
+          reject("Failed to create entity");
         }
       });
     })

@@ -24,6 +24,7 @@ export const KEYS = [
   'dcp_wasaquorumpresent',
   'dcp_projectaction',
   'dcp_representing',
+  'dcp_communityboarddisposition_SharePointDocumentLocations',
 ];
 
 @Entity('dcp_communityboarddisposition')
@@ -93,4 +94,7 @@ export class Disposition {
 
   @Column()
   dcp_projectaction: string;
+
+  @Column()
+  dcp_communityboarddisposition_SharePointDocumentLocations: string;
 }
