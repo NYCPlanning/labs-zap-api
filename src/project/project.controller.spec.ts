@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TilesService } from './tiles/tiles.service';
+import { ConfigService } from '../config/config.service';
 import { ProjectService } from './project.service';
 import { GeometriesService } from './geometries/geometries.service';
 import { ProjectController } from './project.controller';
@@ -26,6 +27,10 @@ describe('Project Controller', () => {
           // how you provide the injection token in a test instance
           useValue: new (class ProjectServiceMock { }),
         },
+        {
+          provide: ConfigService,
+          useValue: new (class ConfigServiceMock { }),
+        }
       ],
     }).compile();
 

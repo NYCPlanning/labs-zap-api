@@ -20,7 +20,6 @@ import { Octokit } from '@octokit/rest';
 
 const findProjectQuery = getQueryFile('/projects/show.sql');
 const boundingBoxQuery = getQueryFile('helpers/bounding-box-query.sql');
-const tileQuery = getQueryFile('helpers/tile-query.sql');
 
 function extractMeta(projects = []) {
   const [{ total_projects: total = 0 } = {}] = projects;
@@ -83,7 +82,7 @@ export class ProjectService {
      */
     const projectIds = await this.projectRepository.query(buildProjectsSQL(request, 'projectids'));
     const projectIdsString = projectIds.map(d => d.projectid).map(d => `'${d}'`).join(',');
-    const tileSQL = pgp.as.format(tileQuery, { projectIds: projectIdsString });
+    const tileSQL = this.tiles.generateTileSQL(projectIdsString);
 
     // create array of projects that have geometry
     const projectsWithGeometries = projects.filter(project => project.has_centroid);
