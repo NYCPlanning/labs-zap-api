@@ -1,3 +1,4 @@
+require('newrelic'); // register newrelic node agent
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
