@@ -432,6 +432,7 @@ SELECT
         dcp_femafloodzonev,
         dcp_projectcompleted,
         dcp_publicstatus,
+        dcp_certificationtargetdate,
         CASE
           WHEN dcp_publicstatus = 'Prefiled' THEN 'Prefiled'
           WHEN dcp_publicstatus = 'Filed' THEN 'Filed'
