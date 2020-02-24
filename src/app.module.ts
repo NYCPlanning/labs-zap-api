@@ -30,6 +30,7 @@ import { DocumentModule } from './document/document.module';
         url: config.get('DATABASE_URL'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: false,
+        ssl: true,
       }),
       imports: [ConfigModule],
       inject: [ConfigService],
