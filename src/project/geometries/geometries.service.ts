@@ -71,7 +71,7 @@ export class GeometriesService {
       failureMessages: [],
       error: 0,
       errorMessages: [],
-      status: 500,
+      status: 200,
     }
 
     // this needs to be rate-limited

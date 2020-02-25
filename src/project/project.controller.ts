@@ -37,11 +37,6 @@ export class ProjectController {
     return await this.geometriesService.upsertGeoms(id);
   }
 
-  @Get('/projects/new-filed')
-  async synchronizeGeometries() {
-    return await this.geometriesService.synchronizeGeoms();
-  }
-
   // Extract the raw Express instance and pass to the query method
   @Get('/projects/')
   async index(@Req() request: Request) {
