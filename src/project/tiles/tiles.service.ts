@@ -10,6 +10,7 @@ import { Project } from '../project.entity';
 import { getQueryFile } from '../../_utils/get-query-file';
 
 const generateVectorTile = getQueryFile('/helpers/generate-vector-tile.sql');
+const tileQuery = getQueryFile('helpers/tile-query.sql');
 
 @Injectable()
 export class TilesService {
@@ -37,9 +38,14 @@ export class TilesService {
     return tileId;
   }
 
+  generateTileSQL(projectIds: string) {
+    return pgp.as.format(tileQuery, { projectIds });
+  }
+
   async generateTile(type, tileId, x, y, z) {
     // retreive the projectids from the cache
-    const tileQuery = await this.get(tileId);
+    // default to a blank query if no cache is found
+    const tileQuery = await this.get(tileId) || this.generateTileSQL('-1');
 
     // calculate the bounding box for this tile
     const bbox = this.mercator.bbox(x, y, z, false, '900913');

@@ -16,10 +16,10 @@ import { handleDownload } from './_utils/handle-download';
 import { buildProjectsSQL } from './_utils/build-projects-sql';
 import { Project, KEYS as PROJECT_KEYS, ACTION_KEYS, MILESTONE_KEYS } from './project.entity';
 import { KEYS as DISPOSITION_KEYS } from '../disposition/disposition.entity';
+import { Octokit } from '@octokit/rest';
 
 const findProjectQuery = getQueryFile('/projects/show.sql');
 const boundingBoxQuery = getQueryFile('helpers/bounding-box-query.sql');
-const tileQuery = getQueryFile('helpers/tile-query.sql');
 
 function extractMeta(projects = []) {
   const [{ total_projects: total = 0 } = {}] = projects;
@@ -82,7 +82,7 @@ export class ProjectService {
      */
     const projectIds = await this.projectRepository.query(buildProjectsSQL(request, 'projectids'));
     const projectIdsString = projectIds.map(d => d.projectid).map(d => `'${d}'`).join(',');
-    const tileSQL = pgp.as.format(tileQuery, { projectIds: projectIdsString });
+    const tileSQL = this.tiles.generateTileSQL(projectIdsString);
 
     // create array of projects that have geometry
     const projectsWithGeometries = projects.filter(project => project.has_centroid);
@@ -185,5 +185,22 @@ export class ProjectService {
     });
 
     return ProjectSerializer.serialize(records);
+  }
+
+  // A function for creating an issue on github based on user feedback sent from frontend `modal-controls` component
+  // Users submit text on the modal stating where they think data is incorrect, which is posted to the backend.
+  // Octokit creates an issue in our dcp-zap-data-feedback repository.
+  // This function is run in an @Post in the project controller.
+  async sendFeedbackToGithubIssue(projectid, projectname, text) {
+    const octokit = new Octokit({
+      auth: this.config.get('GITHUB_ACCESS_TOKEN'),
+    });
+
+    return await octokit.issues.create({
+      owner: 'nycplanning',
+      repo: 'dcp-zap-data-feedback',
+      title: `Feedback about ${projectname}`,
+      body: `Project ID: [${projectid}](https://zap.planning.nyc.gov/projects/${projectid})\nFeedback: ${text}`,
+    });
   }
 }
