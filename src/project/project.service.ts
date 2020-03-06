@@ -65,8 +65,9 @@ export class ProjectService {
     const { query: { page = '1' } } = request;
 
     if (page === '1') {
-      const metaForTiles = await this.generateTilesForQuery(projects, request);
-      meta = { ...meta, ...metaForTiles };
+      meta = {
+        ...meta,
+      };
     }
 
     return this.serialize(projects, meta);

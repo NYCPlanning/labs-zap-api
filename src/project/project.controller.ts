@@ -55,16 +55,8 @@ export class ProjectController {
 
   @Get('/projects/tiles/:tileId/:z/:x/:y.mvt')
   async handleTileRequest(@Req() request: Request, @Res() response) {
-    const { type } = request.query;
-    const { tileId, x, y, z } = request.params;
-    const tile = await this.tilesService.generateTile(type, tileId, x, y, z);
-
     response.setHeader('Content-Type', 'application/x-protobuf');
-
-    if (tile.length === 0) {
-      response.status(204);
-    }
-    response.send(tile);
+    response.status(204);
   }
 
   @Get('/projects.csv')
