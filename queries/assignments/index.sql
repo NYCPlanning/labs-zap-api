@@ -25,6 +25,19 @@ projects_public_statuses AS (
     AND dcp_visibility = 'General Public'
 ),
 
+prefiled AS (
+  SELECT
+    dcp_projectid,
+    dcp_publicstatus,
+    statecode
+  FROM
+    dcp_project
+  WHERE
+    dcp_validatedcommunitydistricts LIKE '%${name}%'
+    AND dcp_publicstatus = 'Prefiled'
+    AND dcp_visibility = 'General Public'
+),
+
 -- get the corresponding milestones for the LUP's reviews
 lups_review_milestones AS (
   SELECT
