@@ -54,6 +54,7 @@
     "nock": "^11.7.0",
     "node-cache": "^4.2.1",
     "node-pg-migrate": "^3.23.3",
+    "odata": "^1.0.4",
     "p-limit": "^2.2.1",
     "pg": "^7.12.1",
     "pg-promise": "^9.2.1",

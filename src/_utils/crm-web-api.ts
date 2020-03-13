@@ -77,9 +77,15 @@ export const CRMWebAPI = {
     return newObj;
   },
 
-  get: async function (query, maxPageSize = 100, headers= {}) {
+  get: async function (query, maxPageSize = 100, headers= {}): Promise<any> {
     //  get token
     const JWToken = await ADAL.acquireToken();
+    const PreferHeaderOptions = [
+      'odata.include-annotations="OData.Community.Display.V1.FormattedValue"',
+      'odata.include-annotations="*"',
+      `odata.maxpagesize=${maxPageSize}`,
+    ].join(',');
+
     const options = {
       url: `${this.host() + query}`,
       headers: {
@@ -89,7 +95,7 @@ export const CRMWebAPI = {
         'OData-MaxVersion': '4.0',
         'OData-Version': '4.0',
         Accept: 'application/json',
-        Prefer: 'odata.include-annotations="*"',
+        Prefer: PreferHeaderOptions,
         ...headers
       },
       encoding: null,

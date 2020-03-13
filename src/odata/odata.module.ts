@@ -4,6 +4,7 @@ import { OdataService } from './odata.service';
 
 @Module({
   imports: [ConfigModule],
+  exports: [OdataService],
   providers: [OdataService],
 })
 export class OdataModule {}

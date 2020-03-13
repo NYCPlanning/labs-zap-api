@@ -1,0 +1,5 @@
+https://dcppfsuat2.crm9.dynamics.com/api/data/v9.1/EntityDefinitions(LogicalName='dcp_project')/Attributes(c2c3d723-7458-4bbe-8ffa-fa3fed2f8ed5)/Microsoft.Dynamics.CRM.PicklistAttributeMetadata
+
+GET [Organization URI]/api/data/v9.0/EntityDefinitions(LogicalName='dcp_project')?$select=LogicalName&$expand=Attributes($select=LogicalName;$filter=AttributeType eq Microsoft.Dynamics.CRM.AttributeTypeCode'Picklist')
+
+GET [Organization URI]/api/data/v9.0/EntityDefinitions(LogicalName='dcp_project')/Attributes/Microsoft.Dynamics.CRM.PicklistAttributeMetadata?$select=LogicalName&$expand=OptionSet,GlobalOptionSet

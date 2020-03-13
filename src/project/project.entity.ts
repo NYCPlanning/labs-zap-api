@@ -30,6 +30,7 @@ export const KEYS = [
   'dcp_wrpnumber',
   'dcp_lpcnumber',
   'dcp_name',
+  'dcp_lastmilestonedate',
   'dcp_nydospermitnumber',
   'bbls',
   'bbl_featurecollection',
@@ -39,6 +40,12 @@ export const KEYS = [
   'center',
   'lastmilestonedate',
   'video_links',
+  'dcp_dcp_project_dcp_projectaction_project',
+  'dcp_dcp_project_dcp_projectapplicant_Project',
+  'dcp_dcp_project_dcp_projectbbl_project',
+  'dcp_dcp_project_dcp_projectmilestone_project',
+  'dcp_ulurpnumber',
+  'dcp_block',
 
   // relationships
   'actions',

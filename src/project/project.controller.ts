@@ -16,7 +16,6 @@ import { TilesService } from './tiles/tiles.service';
 import { GeometriesService } from './geometries/geometries.service';
 import { RecaptchaV2 } from 'express-recaptcha';
 
-
 @Controller()
 export class ProjectController {
   constructor(
@@ -44,13 +43,13 @@ export class ProjectController {
 
   // Extract the raw Express instance and pass to the query method
   @Get('/projects/')
-  async index(@Req() request: Request) {
-    return await this.projectService.queryProjects(request);
+  async index(@Query() query) {
+    return await this.projectService.queryProjects(query);
   }
 
-  @Get('/projects/:id')
+  @Get('/projects/:name')
   async show(@Param() params) {
-    return this.projectService.findOne(params.id);
+    return this.projectService.findOneByName(params.name);
   }
 
   @Get('/projects/tiles/:tileId/:z/:x/:y.mvt')
