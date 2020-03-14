@@ -59,10 +59,10 @@ export class ProjectController {
   }
 
   @Get('/projects.csv')
-  async download(@Param() params, @Req() request: Request, @Res() response) {
+  async download(@Query() query, @Req() request: Request, @Res() response) {
     // renable for now; enable other formats soon
     const filetype = 'csv';
-    const csv = await this.projectService.handleDownload(request, filetype);
+    const csv = await this.projectService.handleDownload(query, filetype);
 
     response.setHeader('Content-type', 'text/csv');
     response.send(csv);

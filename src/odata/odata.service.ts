@@ -6,6 +6,51 @@ import { CRMWebAPI } from '../_utils/crm-web-api';
 
 const COMMUNITY_DISPLAY_TOKEN = '@OData.Community.Display.V1.FormattedValue';
 
+// CRM provides numeric codes for picklist types
+// for example, "yes" might appear as "1"
+// This function maps those values with appropriate labels
+export function overwriteCodesWithLabels(records, targetFields) {
+  return records.map(record => {
+    const newRecord = record;
+
+    // parent record
+    Object.keys(record)
+      .filter(key => key.includes('_formatted'))
+      .map(key => key.replace('_formatted', ''))
+      .forEach(key => {
+        if (targetFields.includes(key)) {
+          newRecord[key] = record[`${key}_formatted`];
+        }
+      });
+
+    // child records
+    // etag here is used to filter for entities
+    // we need keys whos values are arrays
+    const values = Object.entries(record)
+      .filter(([, value]) => Array.isArray(value))
+      .forEach(([, collection]) => {
+
+        collection
+          // @ts-ignore
+          .filter(Boolean)
+          .map(record => {
+            const newRecord = record;
+
+            Object.keys(record)
+              .filter(key => key.includes(COMMUNITY_DISPLAY_TOKEN))
+              .map(key => key.replace(COMMUNITY_DISPLAY_TOKEN, ''))
+              .forEach(key => {
+                if (targetFields.includes(key)) {
+                  newRecord[key] = record[`${key}${COMMUNITY_DISPLAY_TOKEN}`];
+                }
+              });
+         });
+      });
+
+    return newRecord;
+  });
+}
+
 @Injectable()
 export class OdataService {
   constructor(
@@ -25,29 +70,6 @@ export class OdataService {
     CRMWebAPI.CRMUrl = this.config.get('CRM_HOST');
   }
 
-  async query(entity: string, query: string, ...options) {
-    const response = await CRMWebAPI.get(`${entity}?${query}`, ...options);
-    const {
-      value: records,
-      '@odata.nextLink': nextPage = '',
-      '@odata.count': count,
-    } = response;
-    console.log(query);
-    const valueMappedRecords = this.mapValues(records);
-
-    return {
-      count,
-      skipTokenParams: nextPage.split('?')[1],
-      records: valueMappedRecords,
-    }
-  }
-
-  async queryFromObject(entity: string, query: any, ...options) {
-    const queryStringForEntity = this.serializeToQueryString(query);
-
-    return await this.query(entity, queryStringForEntity, ...options);
-  }
-
   update(model, guid, data, headers = {}) {
     if (!this.config.get('SKIP_CRM')) {
       return CRMWebAPI.update(model, guid, data, headers);
@@ -56,40 +78,25 @@ export class OdataService {
     return data;
   }
 
-  mapValues(records) {
-    return records.map(record => {
-      const newRecord = record;
+  async query(entity: string, query: string, ...options) {
+    const response = await CRMWebAPI.get(`${entity}?${query}`, ...options);
+    const {
+      value: records,
+      '@odata.nextLink': nextPage = '',
+      '@odata.count': count,
+    } = response;
 
-      // parent record
-      Object.keys(record)
-        .filter(key => key.includes('_formatted'))
-        .map(key => key.replace('_formatted', ''))
-        .forEach(key => {
-          newRecord[key] = record[`${key}_formatted`];
-        });
+    return {
+      count,
+      skipTokenParams: nextPage.split('?')[1],
+      records,
+    }
+  }
 
-      // child records
-      // etag here is used to filter for entities
-      // we need keys whos values are arrays
-      const values = Object.entries(record)
-        .filter(([, value]) => Array.isArray(value))
-        .forEach(([, collection]) => {
-          // @ts-ignore
-          collection.map(record => {
-            const newRecord = record;
+  async queryFromObject(entity: string, query: any, ...options) {
+    const queryStringForEntity = this.serializeToQueryString(query);
 
-            // parent record
-            Object.keys(record)
-              .filter(key => key.includes(COMMUNITY_DISPLAY_TOKEN))
-              .map(key => key.replace(COMMUNITY_DISPLAY_TOKEN, ''))
-              .forEach(key => {
-                newRecord[key] = record[`${key}${COMMUNITY_DISPLAY_TOKEN}`];
-              });
-           });
-        });
-
-      return newRecord;
-    });
+    return await this.query(entity, queryStringForEntity, ...options);
   }
 
   serializeToQueryString(query: any) {

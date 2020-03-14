@@ -40,12 +40,9 @@ export const KEYS = [
   'center',
   'lastmilestonedate',
   'video_links',
-  'dcp_dcp_project_dcp_projectaction_project',
-  'dcp_dcp_project_dcp_projectapplicant_Project',
-  'dcp_dcp_project_dcp_projectbbl_project',
-  'dcp_dcp_project_dcp_projectmilestone_project',
-  'dcp_ulurpnumber',
-  'dcp_block',
+
+  '_dcp_applicant_customer_value',
+  '_dcp_applicantadministrator_customer_value',
 
   // relationships
   'actions',
@@ -62,6 +59,8 @@ export const ACTION_KEYS = [
   'dcp_ulurpnumber',
   'dcp_zoningresolution',
   'dcp_ccresolutionnumber',
+  '_dcp_action_value',
+  '_dcp_zoningresolution_value',
 ];
 
 export const MILESTONE_KEYS = [
