@@ -52,7 +52,7 @@ export class ProjectService {
 
     await injectSupportDocumentURLs(project);
 
-    project.video_links = await getVideoLinks(this.config.get('AIRTABLE_API_KEY'), project.dcp_name);
+    project.video_links = [];
 
     return this.serialize(project);
   }
