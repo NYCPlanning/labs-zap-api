@@ -22,6 +22,18 @@ import { Project, KEYS as PROJECT_KEYS, ACTION_KEYS, MILESTONE_KEYS } from './pr
 import { KEYS as DISPOSITION_KEYS } from '../disposition/disposition.entity';
 import { Octokit } from '@octokit/rest';
 import { OdataService, overwriteCodesWithLabels } from '../odata/odata.service';
+import { 
+  extractMeta,
+  coerceToNumber,
+  coerceToDateString,
+  mapInLookup,
+  all,
+  any,
+  comparisonOperator,
+  containsString,
+  equalsAnyOf,
+  containsAnyOf 
+} from '../odata/odata.module';
 import * as jwt from 'jsonwebtoken';
 
 const ITEMS_PER_PAGE = 30;
@@ -101,97 +113,6 @@ const FIELD_LABEL_REPLACEMENT_WHITELIST = [
   '_dcp_action_value',
   '_dcp_zoningresolution_value',
 ];
-
-function extractMeta(projects = []) {
-  const [{ total_projects: total = 0 } = {}] = projects;
-  const { length: pageTotal = 0 } = projects;
-
-  return { total, pageTotal };
-}
-
-function coerceToNumber(numericStrings) {
-  return numericStrings.map(stringish => {
-    // smelly; but let's prefer actual null
-    // coercing 'null' turns to 0, which we don't
-    // want in the API query
-    if (stringish === null) return stringish;
-
-    return Number(stringish);
-  });
-}
-
-function coerceToDateString(epoch) {
-  const date = new Date(epoch * 1000);
-  console.log(date);
-
-  return date;
-}
-
-function mapInLookup(arrayOfStrings, lookupHash) {
-  return arrayOfStrings.map(string => lookupHash[string]);
-}
-
-function all(...statements): string {
-  return statements
-    .filter(Boolean)
-    .join(' and ');
-}
-
-function any(...statements): string {
-  return `(${(statements.join(' or '))})`;
-}
-
-function comparisonOperator(propertyName, operator, value) {
-  let typeSafeValue = value
-
-  if ((typeof value === 'string') && value !== 'false' && value !== 'true') {
-    typeSafeValue = `'${value}'`;
-  }
-
-  // most likely means it's a date. we want the date formatting that
-  // json stringify provides.
-  if ((typeof value === 'object') && value !== 'false' && value !== 'true') {
-    const stringyDate = JSON.stringify(value).replace(/"/g, "'");
-
-    typeSafeValue = `${stringyDate}`;
-  }
-
-  return `(${propertyName} ${operator} ${typeSafeValue})`;
-}
-
-function containsString(propertyName, string) {
-  return `contains(${propertyName}, '${string}')`;
-}
-
-function equalsAnyOf(propertyName, strings = []) {
-  const querySegment = strings
-    .map(string => comparisonOperator(propertyName, 'eq', string))
-    .join(' or ');
-
-  return `(${querySegment})`;
-}
-
-function containsAnyOf(propertyName, strings = [], options?) {
-  const {
-    childEntity = '',
-    comparisonStrategy = containsString,
-    not = false,
-  } = options || {};
-
-  const containsQuery = strings
-    .map((string, i) => {
-      // in odata syntax, this character o is a variable for scoping
-      // logic for related entities. it needs to only appear once.
-      const lambdaScope = (childEntity && i === 0) ? `${childEntity}:` : '';
-      const lambdaScopedProperty = childEntity ? `${childEntity}/${propertyName}` : propertyName;
-
-      return `${lambdaScope}${comparisonStrategy(lambdaScopedProperty, string)}`;
-    })
-    .join(' or ');
-  const lambdaQueryPrefix = childEntity ? `${childEntity}/any` : '';
-
-  return `(${not ? 'not ': ''}${lambdaQueryPrefix}(${containsQuery}))`;
-}
 
 // configure received params, provide procedures for generating queries.
 // these funcs do not get called unless they are in the query params.
@@ -452,11 +373,9 @@ export class ProjectService {
 
     // EXTRACT META PARAM VALUES;
     const {
-      // meta: pagination
       skipTokenParams = '',
     } = query;
 
-    // Note: we can't use PROJECT_KEYS yet because they reference the materialized view
     const {
       records: projects,
       skipTokenParams: nextPageSkipTokenParams,

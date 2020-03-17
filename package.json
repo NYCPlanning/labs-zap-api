@@ -56,6 +56,8 @@
     "node-cache": "^4.2.1",
     "node-pg-migrate": "^3.23.3",
     "odata": "^1.0.4",
+    "odata-parser": "^1.4.1",
+    "odata-v4-parser": "^0.1.29",
     "p-limit": "^2.2.1",
     "pg": "^7.12.1",
     "pg-promise": "^9.2.1",

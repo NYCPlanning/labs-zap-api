@@ -5771,6 +5771,16 @@ octokit-pagination-methods@^1.1.0:
   resolved "https://registry.yarnpkg.com/octokit-pagination-methods/-/octokit-pagination-methods-1.1.0.tgz#cf472edc9d551055f9ef73f6e42b4dbb4c80bea4"
   integrity sha512-fZ4qZdQ2nxJvtcasX7Ghl+WlWS/d9IgnBIwFZXVNNZUmzpno91SX5bc5vuxiuKoCtK78XxGGNuSCrDC7xYB3OQ==
 
+odata-parser@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/odata-parser/-/odata-parser-1.4.1.tgz#a2224bc749e76a6205bd47f47acd50eb1e71ed99"
+  integrity sha1-oiJLx0nnamIFvUf0es1Q6x5x7Zk=
+
+odata-v4-parser@^0.1.29:
+  version "0.1.29"
+  resolved "https://registry.yarnpkg.com/odata-v4-parser/-/odata-v4-parser-0.1.29.tgz#49e466037dbc4fc088572a2deae822fc14e6c137"
+  integrity sha512-7ZsqxcMbGAqKSBme0+lul7g9K52RadGYU3WvYwDdduJNfnduSL59w4OEskvEzWHZMcPRqPnD9XtuO7Rpl+B3jA==
+
 odata@^1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/odata/-/odata-1.0.4.tgz#dbc510601fd333c40496e97082fe1b9d7ba373df"
