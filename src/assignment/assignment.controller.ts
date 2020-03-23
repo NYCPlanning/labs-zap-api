@@ -2,7 +2,7 @@ import * as pgp from 'pg-promise';
 import { Controller, Get, Query, Session, HttpException, HttpStatus } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 import { Serializer } from 'jsonapi-serializer';
-import { ContactService } from '../contact/contact.service';
+import { AssignmentService } from '../assignment/assignment.service';
 import { getQueryFile } from '../_utils/get-query-file';
 import { KEYS as ASSIGNMENT_KEYS } from './assignment.entity';
 import { KEYS as DISPOSITION_KEYS } from '../disposition/disposition.entity';
@@ -16,7 +16,7 @@ const projectQuery = getQueryFile('/projects/project.sql');
 @Controller('assignments')
 export class AssignmentController {
   constructor(
-    private readonly contactService: ContactService,
+    private readonly assignmentService: AssignmentService,
   ) {}
 
   @Get('/')
@@ -36,16 +36,12 @@ export class AssignmentController {
         throw new Error('Must be one of archive, reviewed, to-review, upcoming');
       }
 
-      if (email) {
-        ({ contactid } = await this.contactService.findByEmail(email));
-      }
+      // todo: turn into CRM API
+      // if (email) {
+      //   ({ contactid } = await this.contactService.findByEmail(email));
+      // }
 
-      const SQL = pgp.as.format(userAssignmentsQuery, {
-        id: contactid,
-        status: tab,
-      });
-
-      const records = await getConnection().query(SQL);
+      const records = await this.assignmentService.getAssignments(contactid, tab);
 
       return this.serialize(records);
     }

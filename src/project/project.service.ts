@@ -402,7 +402,6 @@ export class ProjectService {
   }
 
   async handleDownload(request, filetype) {
-    const SQL = buildProjectsSQL(request, 'csv_download');
     const { data } = await this.queryProjects(request, 5000);
 
     const deserializedData = data
