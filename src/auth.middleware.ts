@@ -2,7 +2,8 @@ import { Injectable, NestMiddleware } from '@nestjs/common';
 import { AuthService } from './auth/auth.service';
 
 function proceedNoAuth(res, next) {
-  res.clearCookie('token');
+  // TODO: understand why this was necessary
+  // res.clearCookie('token');
   next();
 }
 
