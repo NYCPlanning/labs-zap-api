@@ -33,7 +33,7 @@ export class ContactService {
     const { records: [contact] } = await this.dynamicsWebApi.queryFromObject('contacts', {
       $filter: all(
         comparisonOperator('statuscode', 'eq', 1),
-        `contains(tolower(emailaddress1), tolower('${email}'))`,
+        `startswith(emailaddress1, '${email}')`,
       ),
     });
 
