@@ -199,17 +199,11 @@ function computeStatusTab(project, lupteam) {
       || (milestone.dcp_milestone === '963beec4-dad0-e711-8116-1458d04e2fb8' && lupteam.dcp_lupteammemberrole === 'BB')
     );
 
-  // (dcp_communityboarddisposition.dcp_representing = 'Borough President' AND lups_project_assignments_all.dcp_lupteammemberrole = 'BP')
-  //       OR (dcp_communityboarddisposition.dcp_representing = 'Borough Board' AND lups_project_assignments_all.dcp_lupteammemberrole = 'BB')
-  //       OR (dcp_communityboarddisposition.dcp_representing = 'Community Board' AND lups_project_assignments_all.dcp_lupteammemberrole = 'CB')
-
   const participantDispositions = dispositions.filter(
     disposition => disposition.dcp_representing === 'Borough President' && lupteam.dcp_lupteammemberrole === 'BP'
       || disposition.dcp_representing === 'Borough Board' && lupteam.dcp_lupteammemberrole === 'BB'
       || disposition.dcp_representing === 'Community Board' && lupteam.dcp_lupteammemberrole === 'CB'
     );
-
-  console.log(participantDispositions);
 
   if (project.statecode === 'Inactive') {
     return 'archive';

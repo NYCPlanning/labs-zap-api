@@ -3,6 +3,7 @@ import { Controller, Get, Query, Session, HttpException, HttpStatus } from '@nes
 import { getConnection } from 'typeorm';
 import { Serializer } from 'jsonapi-serializer';
 import { AssignmentService } from '../assignment/assignment.service';
+import { ContactService } from '../contact/contact.service';
 import { getQueryFile } from '../_utils/get-query-file';
 import { KEYS as ASSIGNMENT_KEYS } from './assignment.entity';
 import { KEYS as DISPOSITION_KEYS } from '../disposition/disposition.entity';
@@ -18,6 +19,7 @@ const projectQuery = getQueryFile('/projects/project.sql');
 export class AssignmentController {
   constructor(
     private readonly assignmentService: AssignmentService,
+    private readonly contactService: ContactService,
   ) {}
 
   @Get('/')
@@ -38,9 +40,9 @@ export class AssignmentController {
       }
 
       // todo: turn into CRM API
-      // if (email) {
-      //   ({ contactid } = await this.contactService.findByEmail(email));
-      // }
+      if (email) {
+        ({ contactid } = await this.contactService.findByEmail(email));
+      }
 
       const records = await this.assignmentService.getAssignments(contactid, tab);
       // return records;
