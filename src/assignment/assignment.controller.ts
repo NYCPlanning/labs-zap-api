@@ -32,7 +32,7 @@ export class AssignmentController {
     // we have different queries for LUPP things
     if (tab && contactid) {
       // one of 'archive', 'reviewed', 'to-review', 'upcoming'
-      if (!['archive', 'reviewed', 'to-review', 'upcoming'].includes(tab)) {
+      if (!['archive', 'reviewed', 'to-review', 'upcoming', 'uncategorized'].includes(tab)) {
         throw new Error('Must be one of archive, reviewed, to-review, upcoming');
       }
 
