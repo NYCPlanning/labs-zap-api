@@ -90,6 +90,8 @@ lups_project_assignments_with_tab AS (
         AND lups_dispositions_status.statecode IN ('Inactive', '1')
         AND lups_dispositions_status.statuscode IN ('Submitted', 'Not Submitted', '2', '717170002') -- status becomes submitted once they submit recommendation
         THEN 'reviewed'
+      ELSE
+        'uncategorized'
     END AS tab,
     lups_project_assignments_all.*,
     -- note: the following attributes aren't used in the assignment model; they're only included to help verify that the tab logic is correct
