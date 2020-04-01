@@ -6,7 +6,7 @@ An [Nest](https://github.com/nestjs/nest) api that serves project data from the 
 ## Installation
 
 ```bash
-$ npm install
+$ yarn install
 ```
 
 ## Running the app
