@@ -47,7 +47,7 @@ export class AuthModule {
       console.log('generating cookie...');
 
       const response = await superagent.get(`http://localhost:3000/login?accessToken=${mockJWT}`);
-      const { header: { 'set-cookie': [, token] } } = response;
+      const { header: { 'set-cookie': [token] } } = response;
 
       console.log(`SKIP_AUTH is true! The cookie token is ${token}. Add this to your request headers.`);
     }, 3000);
