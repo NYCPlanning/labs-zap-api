@@ -43,7 +43,7 @@ export async function injectSupportDocumentURLs(project) {
     .reduce((acc, curr) => acc.concat(curr), []);
 
   project.milestones.forEach((milestone) => {
-    const { milestonename } = milestone;
+    const { _dcp_milestone_value: milestonename } = milestone;
     const regex = MILESTONE_TYPES[milestonename];
     milestone.milestone_links = [];
 

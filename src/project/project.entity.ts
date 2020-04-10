@@ -30,6 +30,7 @@ export const KEYS = [
   'dcp_wrpnumber',
   'dcp_lpcnumber',
   'dcp_name',
+  'dcp_lastmilestonedate',
   'dcp_nydospermitnumber',
   'bbls',
   'bbl_featurecollection',
@@ -39,6 +40,9 @@ export const KEYS = [
   'center',
   'lastmilestonedate',
   'video_links',
+
+  '_dcp_applicant_customer_value',
+  '_dcp_applicantadministrator_customer_value',
 
   // relationships
   'actions',
@@ -55,6 +59,8 @@ export const ACTION_KEYS = [
   'dcp_ulurpnumber',
   'dcp_zoningresolution',
   'dcp_ccresolutionnumber',
+  '_dcp_action_value',
+  '_dcp_zoningresolution_value',
 ];
 
 export const MILESTONE_KEYS = [

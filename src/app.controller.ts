@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { Get, Query, Res, Session, Next, HttpException } from '@nestjs/common';
+import { Get, Query, Res, Session, HttpException } from '@nestjs/common';
 import { Response } from 'express';
 import { Serializer } from 'jsonapi-serializer';
 

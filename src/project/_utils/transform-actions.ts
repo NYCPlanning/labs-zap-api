@@ -85,5 +85,18 @@ const actionTypesLookup = {
  * @param {string} actiontypes - ';'-separated list of action types as a string
  * @returns {string}
  */
+ // TODO: This doesn't work anymore
+export const rollupActionTypes = (row) => {
+  row.actiontypes = row.actiontypes ? row.actiontypes
+    .split(';')
+    .map(at => actionTypesLookup[at]).join(';') : '';
+};
 
-export const transform = (row) => { row.actiontypes = row.actiontypes ? row.actiontypes.split(';').map(at => actionTypesLookup[at]).join(';') : ''; };
+export const transformActions = (actions) => {
+  return actions
+    .filter(({ _dcp_action_value }) => Object.keys(actionTypesLookup).includes(_dcp_action_value))
+    .map(action => ({
+      ...action,
+      dcp_name: (action.dcp_name.split('-')[1] || '').trim(),
+    }))
+};

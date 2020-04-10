@@ -2,21 +2,16 @@ import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import * as bodyParser from 'body-parser';
 import * as cookieparser from 'cookie-parser';
 import * as compression from 'compression';
-import { ScheduleModule } from 'nest-schedule';
 import { AuthMiddleware } from './auth.middleware';
 import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProjectModule } from './project/project.module';
-import { TilesModule } from './project/tiles/tiles.module';
-import { ContactService } from './contact/contact.service';
 import { AppController } from './app.controller';
 import { ContactModule } from './contact/contact.module';
-import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
 import { DispositionModule } from './disposition/disposition.module';
 import { OdataModule } from './odata/odata.module';
-import { AssignmentController } from './assignment/assignment.controller';
 import { AssignmentModule } from './assignment/assignment.module';
 import { DocumentModule } from './document/document.module';
 
@@ -41,7 +36,6 @@ import { DocumentModule } from './document/document.module';
     OdataModule,
     AssignmentModule,
     DocumentModule,
-    ScheduleModule.register(),
    ],
   controllers: [AppController],
 })
