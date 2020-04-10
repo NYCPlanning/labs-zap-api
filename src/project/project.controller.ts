@@ -1,6 +1,5 @@
 import {
   Controller,
-  Header,
   Get,
   Post,
   Param,
@@ -8,62 +7,34 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
-import { UseInterceptors } from '@nestjs/common';
 import { Request } from 'express';
 import { ConfigService } from '../config/config.service';
 import { ProjectService } from './project.service';
-import { TilesService } from './tiles/tiles.service';
-import { GeometriesService } from './geometries/geometries.service';
 import { RecaptchaV2 } from 'express-recaptcha';
-
 
 @Controller()
 export class ProjectController {
   constructor(
     private projectService: ProjectService,
     private readonly config: ConfigService,
-    private tilesService: TilesService,
-    private geometriesService: GeometriesService,
   ) {}
-
-  @Get('/projects/update-geometries/:id')
-  async updateGeometries(@Param('id') id, @Query('API_KEY') apiKey) {
-    const isValidKey = this.geometriesService.validateAPIKey(apiKey);
-    const isValidID = this.geometriesService.validateProjectID(id);
-
-    if (!isValidKey) return 'Invalid API_KEY';
-    if (!isValidID) return 'Invalid Project ID';
-
-    return await this.geometriesService.upsertGeoms(id);
-  }
-
-  @Get('/projects/new-filed')
-  async synchronizeGeometries() {
-    return await this.geometriesService.synchronizeGeoms();
-  }
 
   // Extract the raw Express instance and pass to the query method
   @Get('/projects/')
-  async index(@Req() request: Request) {
-    return await this.projectService.queryProjects(request);
+  async index(@Query() query) {
+    return await this.projectService.queryProjects(query);
   }
 
-  @Get('/projects/:id')
+  @Get('/projects/:name')
   async show(@Param() params) {
-    return this.projectService.findOne(params.id);
-  }
-
-  @Get('/projects/tiles/:tileId/:z/:x/:y.mvt')
-  async handleTileRequest(@Req() request: Request, @Res() response) {
-    response.setHeader('Content-Type', 'application/x-protobuf');
-    response.status(204);
+    return this.projectService.findOneByName(params.name);
   }
 
   @Get('/projects.csv')
-  async download(@Param() params, @Req() request: Request, @Res() response) {
+  async download(@Query() query, @Req() request: Request, @Res() response) {
     // renable for now; enable other formats soon
     const filetype = 'csv';
-    const csv = await this.projectService.handleDownload(request, filetype);
+    const csv = await this.projectService.handleDownload(query, filetype);
 
     response.setHeader('Content-type', 'text/csv');
     response.send(csv);
