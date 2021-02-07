@@ -25,36 +25,18 @@ projects_public_statuses AS (
     AND dcp_visibility = 'General Public'
 ),
 
--- get the corresponding milestones for the LUP's reviews
-lups_review_milestones AS (
-  SELECT
-    lups_project_assignments_all.*,
-    dcp_projectmilestone.*
-  FROM
-    lups_project_assignments_all,
-    dcp_projectmilestone
-  WHERE
-    dcp_projectmilestone.statuscode <> 'Overridden'
-    AND dcp_projectmilestone.dcp_project = lups_project_assignments_all.dcp_project
-    AND ( -- this filters down to only keep the milestones that match our user's role
-      (dcp_projectmilestone.dcp_milestone = '923beec4-dad0-e711-8116-1458d04e2fb8' AND lups_project_assignments_all.dcp_lupteammemberrole = 'CB')
-      OR (dcp_projectmilestone.dcp_milestone = '943beec4-dad0-e711-8116-1458d04e2fb8' AND lups_project_assignments_all.dcp_lupteammemberrole = 'BP')
-      OR (dcp_projectmilestone.dcp_milestone = '963beec4-dad0-e711-8116-1458d04e2fb8' AND lups_project_assignments_all.dcp_lupteammemberrole = 'BB')
-    )
-),
-
 -- get the LUP's dispositions for their assigned projects and roles
 lups_dispositions_status AS (
   SELECT
     lups_project_assignments_all.*,
     dcp_communityboarddisposition.statecode AS statecode, -- inactive or active
-    dcp_communityboarddisposition.statuscode AS statuscode -- more descriptive status of draft, saved, submitted, deactivated
+    dcp_communityboarddisposition.statuscode AS statuscode, -- more descriptive status of draft, saved, submitted, deactivated
+    dcp_communityboarddisposition.dcp_visibility -- visibility is used to determine tab in LUP portal
   FROM
     lups_project_assignments_all,
     dcp_communityboarddisposition
   WHERE
     dcp_communityboarddisposition.statuscode <> 'Deactivated'
-    AND dcp_communityboarddisposition.dcp_visibility IN ('General Public', 'LUP')
     AND dcp_communityboarddisposition.dcp_project = lups_project_assignments_all.dcp_project
     AND dcp_communityboarddisposition.dcp_recommendationsubmittedby = ${id} -- plugs in contactid
     AND (
@@ -65,6 +47,7 @@ lups_dispositions_status AS (
   GROUP BY
     dcp_communityboarddisposition.statecode,
     dcp_communityboarddisposition.statuscode,
+    dcp_communityboarddisposition.dcp_visibility,
     lups_project_assignments_all.dcp_project,
     lups_project_assignments_all.dcp_lupteammemberrole,
     lups_project_assignments_all.assignment_id
@@ -78,15 +61,17 @@ lups_project_assignments_with_tab AS (
         projects_public_statuses.statecode = 'Inactive'
         THEN 'archive'
       WHEN
-        lups_review_milestones.statuscode = 'Not Started'
+        lups_dispositions_status.dcp_visibility IS NULL
+        AND lups_dispositions_status.statecode IN ('Active', '0')
+        AND lups_dispositions_status.statuscode IN ('Draft', '1') -- draft status before LUP makes any edits
         THEN 'upcoming'
       WHEN
-        lups_review_milestones.statuscode IN ('In Progress', 'Completed')
+        lups_dispositions_status.dcp_visibility IN ('General Public', 'LUP')
         AND lups_dispositions_status.statecode IN ('Active', '0')
         AND lups_dispositions_status.statuscode IN ('Draft', 'Saved', '1', '717170000') -- draft status before LUP makes any edits, saved status after they've submitted hearing
         THEN 'to-review'
       WHEN
-        lups_review_milestones.statuscode IN ('In Progress', 'Completed')
+        lups_dispositions_status.dcp_visibility IN ('General Public', 'LUP')
         AND lups_dispositions_status.statecode IN ('Inactive', '1')
         AND lups_dispositions_status.statuscode IN ('Submitted', 'Not Submitted', '2', '717170002') -- status becomes submitted once they submit recommendation
         THEN 'reviewed'
@@ -96,17 +81,15 @@ lups_project_assignments_with_tab AS (
     lups_project_assignments_all.*,
     -- note: the following attributes aren't used in the assignment model; they're only included to help verify that the tab logic is correct
     projects_public_statuses.dcp_publicstatus,
-    lups_review_milestones.statuscode AS milestone_statuscode,
     lups_dispositions_status.statecode AS disp_statecode,
-    lups_dispositions_status.statuscode AS disp_statuscode
+    lups_dispositions_status.statuscode AS disp_statuscode,
+    lups_dispositions_status.dcp_visibility AS disp_visibility
   FROM
     lups_project_assignments_all
   INNER JOIN -- inner because we only want projects that are visible to public
     projects_public_statuses ON lups_project_assignments_all.dcp_project = projects_public_statuses.dcp_projectid
   LEFT JOIN
     lups_dispositions_status ON lups_project_assignments_all.assignment_id = lups_dispositions_status.assignment_id
-  LEFT JOIN
-    lups_review_milestones ON lups_project_assignments_all.assignment_id = lups_review_milestones.assignment_id
 ),
 
 -- filter the previous table; we only want to see the BB assignment card for to-review projects and post-cert projects in upcoming
