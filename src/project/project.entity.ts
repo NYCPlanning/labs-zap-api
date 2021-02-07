@@ -39,6 +39,7 @@ export const KEYS = [
   'center',
   'lastmilestonedate',
   'video_links',
+  'dcp_certificationtargetdate',
 
   // relationships
   'actions',
